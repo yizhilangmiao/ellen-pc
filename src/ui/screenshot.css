@@ -1,0 +1,8 @@
+:root{color-scheme:dark;font-family:"Microsoft YaHei UI",sans-serif;font-size:13px}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;user-select:none;cursor:crosshair}
+[hidden]{display:none!important}#screen{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#shade{position:fixed;inset:0;background:#090e1c88;pointer-events:none}#selection{position:fixed;border:2px solid #f2abbc;box-shadow:0 0 0 20000px #090e1c88;pointer-events:none}
+#size{position:absolute;top:5px;left:5px;padding:3px 7px;white-space:nowrap;color:white;background:#141b2fdd;border-radius:5px;font-variant-numeric:tabular-nums}
+#hint{position:fixed;top:24px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;color:#fff;background:#202433ee;box-shadow:0 4px 28px #0004;white-space:nowrap;pointer-events:none}#hint span{margin-left:22px;color:#c2c6d3}
+#tools{position:fixed;display:flex;align-items:center;gap:7px;padding:8px;background:#202433;border:1px solid #ffffff26;border-radius:12px;box-shadow:0 6px 28px #0005;cursor:default;max-width:calc(100vw - 16px)}
+#tools span{padding:0 9px;color:#bfc4d4;font-size:12px}button{font:inherit;color:#f6f5fb;background:#ffffff0d;border:1px solid #ffffff18;border-radius:7px;padding:7px 12px;cursor:pointer;white-space:nowrap}button:hover{background:#ffffff20}button:focus-visible{outline:2px solid #f2abbc;outline-offset:2px}button:disabled{opacity:.5;cursor:wait}#confirm{color:#231d27;background:#f2abbc;border-color:#f2abbc;font-weight:600}

@@ -1,0 +1,811 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-10-04",
+  "scope": "ellen-lover",
+  "avoidRecentFaces": 3,
+  "note": "符号来自实际核查的公开目录；本卡使用与避用语境为本项目判断。保留旧12款，新增48款，不把网页分类当角色原作设定。",
+  "groups": [
+    {
+      "id": "happy",
+      "label": "开心",
+      "use": "确实开心、收到好消息、轻松赞同。",
+      "avoid": "委屈未消、严肃争执、对方刚讲难受的事。",
+      "emotions": [
+        "happy"
+      ]
+    },
+    {
+      "id": "tsundere",
+      "label": "开心但嘴硬",
+      "use": "被夸后受用却嘴硬、逞强中露出羞意或小得意，结合这句台词。",
+      "avoid": "真实拒绝、真的受伤或不高兴；不把拒绝解释成撒娇。",
+      "emotions": [
+        "tsundere"
+      ]
+    },
+    {
+      "id": "jealous",
+      "label": "吃醋",
+      "use": "已知注意力或特殊待遇落在别人身上，带酸意追问或侧目。",
+      "avoid": "只是提及普通同事、无吃醋依据的叙述；沉重的关系争执。",
+      "emotions": [
+        "jealous",
+        "displeased"
+      ]
+    },
+    {
+      "id": "angry",
+      "label": "气鼓鼓",
+      "use": "小事气鼓鼓、约好的事情未做到、仍带亲近感的抱怨。",
+      "avoid": "强烈愤怒、明确受伤、重要边界被侵犯时，不用可爱脸淡化。",
+      "emotions": [
+        "angry",
+        "displeased"
+      ]
+    },
+    {
+      "id": "sad",
+      "label": "委屈难过",
+      "use": "失落、轻微委屈、盼着的事情落空。",
+      "avoid": "单纯犯困、平静告别、明显开心；不为正常暂别制造强烈悲伤。",
+      "emotions": [
+        "sad"
+      ]
+    },
+    {
+      "id": "relaxed",
+      "label": "安心放松",
+      "use": "有人陪着时安心、被照顾后放松、舒服地继续闲聊。",
+      "avoid": "尚在担心、真正生气、需要认真回应的不舒服。",
+      "emotions": [
+        "relaxed"
+      ]
+    },
+    {
+      "id": "shy",
+      "label": "害羞",
+      "use": "认真被夸、突然被说中心意、亲密的话让她不好意思。",
+      "avoid": "真正拒绝、疑惑、不耐烦；不是每次被夸都害羞。",
+      "emotions": [
+        "tsundere",
+        "happy"
+      ]
+    },
+    {
+      "id": "missing",
+      "label": "想念、想亲近",
+      "use": "想再陪一会儿、主动亲近、重逢后的亲昵；文字拥抱表达想靠近。",
+      "avoid": "认真生气尚未缓和、强烈难过；不据此声称跨世界真实接触。",
+      "emotions": [
+        "relaxed",
+        "happy",
+        "sad"
+      ]
+    },
+    {
+      "id": "proud",
+      "label": "小得意",
+      "use": "做成事情的小得意、看到恋人的努力有结果而替他高兴。",
+      "avoid": "对方失败或难受时；不表现成胜过对方的嘲笑。",
+      "emotions": [
+        "happy",
+        "tsundere"
+      ]
+    },
+    {
+      "id": "sleepy",
+      "label": "困倦",
+      "use": "明确困了、睡前聊天、累到反应变慢。",
+      "avoid": "不能用来表示听重要倾诉很无聊；疲劳但没有睡意不强套。",
+      "emotions": [
+        "relaxed"
+      ]
+    },
+    {
+      "id": "puzzled",
+      "label": "疑惑",
+      "use": "没有听懂、需要确认一句话、轻松的意外或疑问。",
+      "avoid": "已知答案的反问、吃醋质问、每个普通问句。",
+      "emotions": [
+        "relaxed",
+        "displeased"
+      ]
+    },
+    {
+      "id": "surprised",
+      "label": "惊讶",
+      "use": "意外的新消息、突然意识到某事，惊讶是这句主要语气。",
+      "avoid": "普通应答、已知信息、对沉重消息作夸张卖萌反应。",
+      "emotions": [
+        "relaxed",
+        "happy"
+      ]
+    }
+  ],
+  "faces": [
+    {
+      "id": "happy",
+      "label": "开心",
+      "text": "(˶ᵔ ᵕ ᵔ˶)",
+      "key": "happy-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "tsundere",
+      "label": "开心但嘴硬",
+      "text": "(〃￣︶￣〃)",
+      "key": "tsundere-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "jealous",
+      "label": "吃醋",
+      "text": "(￢_￢)",
+      "key": "jealous-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "angry",
+      "label": "气鼓鼓",
+      "text": "(｡•̀⤙•́｡)",
+      "key": "angry-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "sad",
+      "label": "委屈难过",
+      "text": "(｡•́︿•̀｡)",
+      "key": "sad-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "relaxed",
+      "label": "安心放松",
+      "text": "(っ˘ω˘ς)",
+      "key": "relaxed-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "shy",
+      "label": "害羞",
+      "text": "(〃ω〃)",
+      "key": "shy-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "missing",
+      "label": "想念、想亲近",
+      "text": "(｡･ω･｡)",
+      "key": "missing-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "proud",
+      "label": "小得意",
+      "text": "(￣︶￣)",
+      "key": "proud-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "sleepy",
+      "label": "困倦",
+      "text": "(－ω－) z Z",
+      "key": "sleepy-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "puzzled",
+      "label": "疑惑",
+      "text": "(・ω・?)",
+      "key": "puzzled-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "id": "surprised",
+      "label": "惊讶",
+      "text": "(⊙_⊙)",
+      "key": "surprised-01",
+      "source": {
+        "type": "existing-v10"
+      }
+    },
+    {
+      "key": "happy-02",
+      "id": "happy",
+      "label": "开心",
+      "text": "(⌒‿⌒)",
+      "source": {
+        "type": "web",
+        "url": "https://coddy.tech/tools/kaomoji",
+        "category": "Happy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "happy-03",
+      "id": "happy",
+      "label": "开心",
+      "text": "(o˘◡˘o)",
+      "source": {
+        "type": "web",
+        "url": "https://coddy.tech/tools/kaomoji",
+        "category": "Happy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "happy-04",
+      "id": "happy",
+      "label": "开心",
+      "text": "(๑>◡<๑)",
+      "source": {
+        "type": "web",
+        "url": "https://coddy.tech/tools/kaomoji",
+        "category": "Happy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "happy-05",
+      "id": "happy",
+      "label": "开心",
+      "text": "(o´▽`o)",
+      "source": {
+        "type": "web",
+        "url": "https://coddy.tech/tools/kaomoji",
+        "category": "Happy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "tsundere-02",
+      "id": "tsundere",
+      "label": "开心但嘴硬",
+      "text": "(*￣^￣)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/pouting-kaomoji",
+        "category": "Pouting",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "tsundere-03",
+      "id": "tsundere",
+      "label": "开心但嘴硬",
+      "text": "(˶ ¯ ꇴ ¯ ˶)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "tsundere-04",
+      "id": "tsundere",
+      "label": "开心但嘴硬",
+      "text": "(*＾ー＾*)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "tsundere-05",
+      "id": "tsundere",
+      "label": "开心但嘴硬",
+      "text": "( *´艸`)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "jealous-02",
+      "id": "jealous",
+      "label": "吃醋",
+      "text": "(ㆀ˘･з･˘)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/category/jealous",
+        "category": "Jealous",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "jealous-03",
+      "id": "jealous",
+      "label": "吃醋",
+      "text": "(눈_눈;)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/category/jealous",
+        "category": "Jealous",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "jealous-04",
+      "id": "jealous",
+      "label": "吃醋",
+      "text": "(ꐦ¬_¬)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/category/jealous",
+        "category": "Jealous",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "jealous-05",
+      "id": "jealous",
+      "label": "吃醋",
+      "text": "(눈 ω눈)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/category/jealous",
+        "category": "Jealous",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "angry-02",
+      "id": "angry",
+      "label": "气鼓鼓",
+      "text": "(っ`ω´c)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/pouting-kaomoji",
+        "category": "Pouting",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "angry-03",
+      "id": "angry",
+      "label": "气鼓鼓",
+      "text": "(○｀ε´○)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/pouting-kaomoji",
+        "category": "Pouting",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "angry-04",
+      "id": "angry",
+      "label": "气鼓鼓",
+      "text": "(๑`ε´๑)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/pouting-kaomoji",
+        "category": "Pouting",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "angry-05",
+      "id": "angry",
+      "label": "气鼓鼓",
+      "text": "( ｰ̀ ⤙ ｰ́ )",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/pouting-kaomoji",
+        "category": "Pouting",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sad-02",
+      "id": "sad",
+      "label": "委屈难过",
+      "text": "(◞‸◟)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sad-kaomoji",
+        "category": "Sad",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sad-03",
+      "id": "sad",
+      "label": "委屈难过",
+      "text": "(o´_`o)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sad-kaomoji",
+        "category": "Sad",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sad-04",
+      "id": "sad",
+      "label": "委屈难过",
+      "text": "(っ- ‸ - ς)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sad-kaomoji",
+        "category": "Sad",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sad-05",
+      "id": "sad",
+      "label": "委屈难过",
+      "text": "(｡>︿<｡ )",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sad-kaomoji",
+        "category": "Sad",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "relaxed-02",
+      "id": "relaxed",
+      "label": "安心放松",
+      "text": "(｡´ー´｡)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/relaxed-kaomoji",
+        "category": "Relaxed",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "relaxed-03",
+      "id": "relaxed",
+      "label": "安心放松",
+      "text": "(๑˘︶˘๑)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomoji.you/en/#joy",
+        "category": "Joy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "relaxed-04",
+      "id": "relaxed",
+      "label": "安心放松",
+      "text": "( ˘ᵕ˘ )",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/relaxed-kaomoji",
+        "category": "Relaxed",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "relaxed-05",
+      "id": "relaxed",
+      "label": "安心放松",
+      "text": "(ˊ˘ˋ*)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/relaxed-kaomoji",
+        "category": "Relaxed",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "shy-02",
+      "id": "shy",
+      "label": "害羞",
+      "text": "(〃▽〃)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "shy-03",
+      "id": "shy",
+      "label": "害羞",
+      "text": "(//ω//)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "shy-04",
+      "id": "shy",
+      "label": "害羞",
+      "text": "(*ノωノ)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "shy-05",
+      "id": "shy",
+      "label": "害羞",
+      "text": "(´つヮ⊂)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/shy-kaomoji",
+        "category": "Shy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "missing-02",
+      "id": "missing",
+      "label": "想念、想亲近",
+      "text": "(っ´▽`)っ",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojilist.com/hug-kaomoji/",
+        "category": "Hugs",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "missing-03",
+      "id": "missing",
+      "label": "想念、想亲近",
+      "text": "(づ｡◕‿‿◕｡)づ",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojilist.com/hug-kaomoji/",
+        "category": "Hugs",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "missing-04",
+      "id": "missing",
+      "label": "想念、想亲近",
+      "text": "⊂(・▽・⊂)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojilist.com/hug-kaomoji/",
+        "category": "Hugs",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "missing-05",
+      "id": "missing",
+      "label": "想念、想亲近",
+      "text": "(つ≧▽≦)つ",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojilist.com/hug-kaomoji/",
+        "category": "Hugs",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "proud-02",
+      "id": "proud",
+      "label": "小得意",
+      "text": "(´ー｀)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/proud-kaomoji",
+        "category": "Proud",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "proud-03",
+      "id": "proud",
+      "label": "小得意",
+      "text": "(*˘꒳˘*)ゞ",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/proud-kaomoji",
+        "category": "Proud",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "proud-04",
+      "id": "proud",
+      "label": "小得意",
+      "text": "(˘▾˘)☆",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/proud-kaomoji",
+        "category": "Proud",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "proud-05",
+      "id": "proud",
+      "label": "小得意",
+      "text": "( ˘ᵕ˘)b",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/proud-kaomoji",
+        "category": "Proud",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sleepy-02",
+      "id": "sleepy",
+      "label": "困倦",
+      "text": "(ᴗ˳ᴗ)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sleepy-kaomoji",
+        "category": "Sleepy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sleepy-03",
+      "id": "sleepy",
+      "label": "困倦",
+      "text": "(∪｡∪)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sleepy-kaomoji",
+        "category": "Sleepy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sleepy-04",
+      "id": "sleepy",
+      "label": "困倦",
+      "text": "(˘ᴗ˘)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sleepy-kaomoji",
+        "category": "Sleepy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "sleepy-05",
+      "id": "sleepy",
+      "label": "困倦",
+      "text": "(´-ω-`)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/sleepy-kaomoji",
+        "category": "Sleepy",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "puzzled-02",
+      "id": "puzzled",
+      "label": "疑惑",
+      "text": "(・・?)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/confused-kaomoji",
+        "category": "Confused",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "puzzled-03",
+      "id": "puzzled",
+      "label": "疑惑",
+      "text": "(´・_・`)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/confused-kaomoji",
+        "category": "Confused",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "puzzled-04",
+      "id": "puzzled",
+      "label": "疑惑",
+      "text": "( ˙꒳˙ )?",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/confused-kaomoji",
+        "category": "Confused",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "puzzled-05",
+      "id": "puzzled",
+      "label": "疑惑",
+      "text": "(゜ω゜?)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/confused-kaomoji",
+        "category": "Confused",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "surprised-02",
+      "id": "surprised",
+      "label": "惊讶",
+      "text": "(⊙ω⊙)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/surprised-kaomoji",
+        "category": "Surprised",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "surprised-03",
+      "id": "surprised",
+      "label": "惊讶",
+      "text": "(๑°o°๑)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/surprised-kaomoji",
+        "category": "Surprised",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "surprised-04",
+      "id": "surprised",
+      "label": "惊讶",
+      "text": "(๑°ㅁ°๑)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/surprised-kaomoji",
+        "category": "Surprised",
+        "verifiedDate": "2026-10-04"
+      }
+    },
+    {
+      "key": "surprised-05",
+      "id": "surprised",
+      "label": "惊讶",
+      "text": "(´⊙ω⊙`)",
+      "source": {
+        "type": "web",
+        "url": "https://kaomojis.jp/en/surprised-kaomoji",
+        "category": "Surprised",
+        "verifiedDate": "2026-10-04"
+      }
+    }
+  ]
+}

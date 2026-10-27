@@ -1,0 +1,1 @@
+!function(e){const o=Object.freeze({enabled:!0});"object"==typeof module&&module.exports?module.exports=o:e.realtimeAvailability=o}("object"==typeof window?window:globalThis);

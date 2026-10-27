@@ -1,0 +1,9 @@
+#error{display:flex;align-items:center;gap:12px}
+#error-message{flex:1;min-width:0;overflow-wrap:anywhere}
+#retry-reply{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:none;min-height:40px;padding:8px 12px;border:1px solid #aeb4bf88;border-radius:10px;color:#f4f4f1;background:#30363e;font:inherit;white-space:nowrap}
+#retry-reply svg{width:18px;height:18px;flex:none}
+#retry-reply:hover:enabled{background:#424953;border-color:#d6a0b4}
+#retry-reply:disabled{opacity:.5;cursor:default}
+#error-close{position:sticky;top:0;align-self:flex-start;display:grid;place-items:center;flex:none;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:8px;color:inherit;background:transparent;font:24px/1 sans-serif;cursor:pointer}
+#error-close:hover{background:#d699a81c;border-color:#d699a844}
+#error-close:focus-visible{outline:2px solid #edb3c8;outline-offset:2px}

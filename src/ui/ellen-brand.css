@@ -1,0 +1,15 @@
+/* Approved C: shark badge and outlined wordmark share one stable hit area. */
+.ellen-ui .brand { gap: 0; }
+.ellen-ui .brand .ellen-brand-logo {
+  display: block;
+  width: calc(200px * var(--s));
+  height: calc(60px * var(--s));
+  object-fit: contain;
+  user-select: none;
+}
+@media (max-width: 1100px) {
+  .ellen-ui .brand .ellen-brand-logo { max-width: 150px; }
+}
+@media (max-width: 740px) {
+  .ellen-ui .brand .ellen-brand-logo { max-width: 110px; }
+}

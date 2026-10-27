@@ -1,0 +1,23 @@
+.realtime-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 3px 3px;color:var(--muted,#aaa);font-size:12px}
+.realtime-controls[hidden]{display:none!important}
+.realtime-controls button{border:1px solid rgba(220,213,220,.2);border-radius:15px;padding:7px 13px;background:rgba(255,255,255,.035);color:#ded9df;font:inherit;cursor:pointer}
+.realtime-controls button:hover{background:rgba(255,255,255,.08)}
+.realtime-controls button:focus-visible{outline:2px solid #ccb6c3;outline-offset:3px}
+.realtime-controls button:disabled{opacity:.45;cursor:default}
+.ellen-ui .chat-frame .compose-actions{gap:8px;flex-wrap:wrap}
+.ellen-ui .chat-frame .compose-voice-actions{display:flex;align-items:center;gap:8px;flex:none;margin-left:auto}
+.ellen-ui .chat-frame .compose-actions #voice-toggle{flex:none;width:112px;min-width:0;height:38px;min-height:38px;padding:7px 10px;margin:0;border-radius:13px;font:14px/1.2 var(--ui)}
+.ellen-ui .chat-frame .compose-actions #voice-toggle:before{width:11px;height:15px;border-width:1.7px;margin-right:6px;flex:none}
+.ellen-ui .chat-frame .compose-actions #send{flex-shrink:0}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle{display:inline-flex;align-items:center;justify-content:center;flex:none;gap:7px;width:112px;min-height:38px;height:38px;padding:7px 10px;margin:0;border:1px solid #f1ccdf;border-radius:13px;background:#dfb1c5;color:#402e40;box-shadow:0 3px 0 #886577;font:14px/1.2 var(--ui);white-space:nowrap;cursor:pointer;transition:background-color 140ms ease,transform 140ms ease,box-shadow 140ms ease}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle[hidden]{display:none}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle svg{width:17px;height:17px;flex:none}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle:hover:not(:disabled){background:#efc5d7;transform:translateY(-1px);box-shadow:0 4px 0 #886577}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #886577}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle:focus-visible{outline:2px solid #fff3f7;outline-offset:3px}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle:disabled{opacity:.45;cursor:default}
+.ellen-ui .chat-frame .compose-actions #realtime-toggle[aria-pressed=true]{background:#c6bdd5;border-color:#e1d6ed;color:#392f4b;box-shadow:0 3px 0 #7f758e}
+@media(prefers-reduced-motion:reduce){.ellen-ui .chat-frame .compose-actions #realtime-toggle{transition:none;transform:none!important}}
+.reduce-ui-motion .chat-frame .compose-actions #realtime-toggle{transition:none!important;transform:none!important}
+#realtime-status{flex:1;min-width:150px;line-height:1.5}
+@media(max-width:800px){.realtime-controls{gap:7px;padding-top:5px}.realtime-controls button{padding:6px 11px}}

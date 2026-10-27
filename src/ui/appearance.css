@@ -1,0 +1,37 @@
+/* Role appearance uses the same local source across chat, profile and calling. */
+.ellen-ui .avatar{transition-property:filter,scale}
+.ellen-ui.appearance-avatar .avatar,
+.ellen-ui.appearance-avatar .chat-frame .message:not(.user)::before{background-image:var(--appearance-avatar);background-size:contain;background-position:center;background-repeat:no-repeat;background-color:#252b33;border-radius:50%}
+.ellen-ui.appearance-avatar .ellen-identity-avatar{background-color:transparent}
+.custom-wallpaper .wallpaper{background-image:none;background-color:#222730}
+.custom-wallpaper .wallpaper::before,.custom-wallpaper .wallpaper::after{content:'';position:absolute;inset:0;background-image:var(--appearance-image);background-repeat:no-repeat;background-position:var(--appearance-x,50%) var(--appearance-y,50%);pointer-events:none}
+.custom-wallpaper .wallpaper::before{inset:-35px;background-size:cover;filter:blur(26px);opacity:.78}
+.custom-wallpaper .wallpaper::after{background-size:contain}
+.custom-wallpaper[data-background-fit=contain] .wallpaper::after{inset:10px}
+.custom-wallpaper[data-background-fit=cover] .wallpaper::after{background-size:cover}
+.custom-wallpaper .ellen-living-layer,.custom-wallpaper .motion-moonlight{visibility:hidden;opacity:0}
+#appearance-dialog{width:min(660px,calc(100vw - 36px));max-height:calc(100dvh - 40px);padding:22px;background:#1d232bf5;color:#f4f4f1;border:1px solid #c4b3bf70;border-radius:20px;overflow:auto}
+#appearance-dialog>header{display:flex;align-items:center;justify-content:space-between;gap:14px}
+#appearance-dialog h2{margin:0;font-size:23px;font-weight:400}
+#appearance-dialog .appearance-note{font-size:13px;line-height:1.65;color:#c3c5cf;margin:12px 0}
+.appearance-tabs{display:flex;gap:20px;border-bottom:1px solid #ffffff24;margin-bottom:20px}
+.appearance-tabs [role=tab]{padding:12px 3px;border-bottom:2px solid transparent}
+.appearance-tabs [aria-selected=true]{border-color:#d6a0b4;color:#f3c3d4}
+.appearance-avatars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 20px}
+.appearance-avatars>button{padding:14px 5px;display:grid;justify-items:center;gap:10px;border:1px solid #adb8c13d;border-radius:15px;background:#ffffff04}
+.appearance-avatars>button[aria-pressed=true]{border-color:#e2a7bf;background:#d6a0b41d}
+#appearance-dialog .appearance-avatars img{width:95px;height:95px;object-fit:contain;filter:none;border-radius:50%;background:#292e37}
+.appearance-avatars span{font-size:14px}
+#appearance-dialog .appearance-secondary,#appearance-dialog .appearance-primary{padding:9px 12px;border:1px solid #c4b3bf70;border-radius:10px}
+#appearance-dialog .appearance-primary{background:#edc1d3;color:#27232a;border-color:transparent}
+.appearance-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:15px}
+.appearance-preview{height:210px;position:relative;isolation:isolate;overflow:hidden;border:1px solid #ffffff38;border-radius:12px;background:#222730}
+.appearance-preview-image,.appearance-preview-blur{position:absolute;inset:0;background-image:var(--appearance-image);background-repeat:no-repeat;background-size:contain;background-position:var(--appearance-x,50%) var(--appearance-y,50%)}
+.appearance-preview-blur{inset:-30px;background-size:cover;filter:blur(24px);opacity:.78}
+.appearance-preview[data-fit=cover] .appearance-preview-image{background-size:cover}
+#appearance-fit{border:0;padding:0;margin:18px 0 0;display:flex;flex-wrap:wrap;gap:14px}
+#appearance-fit legend{margin-bottom:8px}#appearance-fit label{display:flex;align-items:center;gap:6px;font-size:14px}#appearance-dialog input{accent-color:#dfa9bf}#appearance-dialog input[type=radio]{width:16px;height:16px;padding:0}
+#appearance-position:not([hidden]){display:grid;gap:12px}#appearance-position label{display:flex;align-items:center;gap:12px;font-size:13px}#appearance-dialog input[type=range]{flex:1;padding:0;min-width:0}#appearance-center{justify-self:start}
+#appearance-status{min-height:22px;margin:16px 0 0;font-size:13px;color:#bfd7c5}#appearance-status[data-error=true]{color:#ffc1ce}
+#appearance-dialog button:disabled{opacity:.5;cursor:default}
+@media(max-height:650px){#appearance-dialog{padding:16px;max-height:calc(100dvh - 24px)}.appearance-preview{height:150px}.appearance-tabs{margin-bottom:12px}}

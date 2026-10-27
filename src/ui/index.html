@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN" class="ellen-startup-pending">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: companion-appearance:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; media-src 'self' blob: companion-media:; form-action 'none'; object-src 'none'; base-uri 'none'">
+  <title>艾莲 · 陪伴伙伴</title>
+  <link rel="stylesheet" href="desktop-mini-entry.css">
+  <link rel="preload" href="assets/client/ZCOOLKuaiLe-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <script src="realtime-availability.js"></script><link rel="stylesheet" href="realtime-voice.css"><script src="realtime-capture-queue.js"></script><script src="call-dial-tone.js"></script><script src="realtime-voice.js"></script>
+  <link rel="stylesheet" href="ellen-startup.css"><script src="ellen-startup.js"></script>
+  <link rel="stylesheet" href="ellen-reference.css"><link rel="stylesheet" href="model-settings.css"><link rel="stylesheet" href="ellen-shell.css"><link rel="stylesheet" href="memory-panel.css"><link rel="stylesheet" href="message-parts.css"><link rel="stylesheet" href="ellen-theme.css"><link rel="stylesheet" href="token-usage.css"><link rel="stylesheet" href="ellen-motion.css"><link rel="stylesheet" href="ellen-brand.css"><link rel="stylesheet" href="ellen-intro.css">
+  <script src="ellen-intro.js" defer></script>
+  <link rel="stylesheet" href="ellen-living-wallpaper.css"><script src="ellen-living-wallpaper.js" defer></script>
+  <link rel="stylesheet" href="ellen-notebook.css">
+  <link rel="stylesheet" href="ellen-typography.css">
+  <link rel="stylesheet" href="ellen-chat-layout.css"><link rel="stylesheet" href="media.css"><link rel="stylesheet" href="voice-messages.css"><link rel="stylesheet" href="ellen-frame.css"><link rel="stylesheet" href="ellen-call-window.css"><link rel="stylesheet" href="call-history.css">
+  <link rel="stylesheet" href="ellen-tab-motion.css">
+  <link rel="stylesheet" href="chat-retry.css">
+  <link rel="stylesheet" href="api-cost.css">
+  <link rel="stylesheet" href="feedback.css">
+  <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="character-manager.css">
+  <link rel="stylesheet" href="emotion.css">
+  <link rel="stylesheet" href="stickers.css">
+  <link rel="stylesheet" href="appearance.css">
+  <link rel="stylesheet" href="conversation-manager.css">
+  <link rel="stylesheet" href="milestones.css">
+  <link rel="stylesheet" href="voice-provider-settings.css"><link rel="stylesheet" href="speech-volume.css">
+  <link rel="stylesheet" href="desktop-controls.css">
+  <link rel="stylesheet" href="ellen-swim-pet.css">
+  <link rel="stylesheet" href="background-music.css">
+</head>
+<body class="client-ui ellen-ui framed-ui">
+  <svg class="svg-defs" aria-hidden="true"><defs>
+    <symbol id="bunny" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#111319" stroke="#bcbac9" stroke-width="1.2"/><path d="M17 24C11 13 11 5 15 7c3 2 5 10 6 16m5 0c1-10 5-17 8-16 4 2-1 13-4 18" fill="#f7f3f4"/><path d="M13 30c0-8 7-11 12-10 9 0 13 6 12 13-2 8-24 10-24-3" fill="#f3f2f3"/><ellipse cx="19" cy="29" rx="3" ry="4" fill="#14161c"/><ellipse cx="30" cy="29" rx="3" ry="4" fill="#14161c"/><circle cx="20" cy="28" r="1" fill="#fff"/><circle cx="31" cy="28" r="1" fill="#fff"/><path d="m23 33 3 0-1.5 2z" fill="#24212c"/><path d="m20 36 3 1 2-2 2 2 3-1" fill="none" stroke="#24212c" stroke-width="1"/></symbol>
+    <symbol id="heart" viewBox="0 0 82 76"><path d="M41 68C27 57 7 42 7 26 7 9 27 3 41 18 55 3 75 9 75 26c0 16-20 31-34 42Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+  </defs></svg>
+  <div class="wallpaper" aria-hidden="true"></div><div class="wallpaper-shade" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#" data-action="home" aria-label="艾莲首页" draggable="false"><img class="ellen-brand-logo" src="assets/ellen/ellen-brand-badge.svg" width="200" height="60" alt="艾莲" draggable="false"></a>
+    <div class="frame-page-heading"><strong id="frame-page-title" hidden></strong><span>有事叫我。带糖更好。</span><i data-lucide="heart" aria-hidden="true"></i></div>
+    <div id="frame-call-slot" class="frame-call-slot"></div>
+    <button class="profile-switch" data-action="appearance" aria-label="更换头像与背景" aria-haspopup="dialog" aria-controls="appearance-dialog"><span class="avatar avatar-top"></span><span data-character-name>艾莲</span><i data-lucide="heart" class="pink-heart"></i></button>
+    <div class="top-tools"><button class="icon-button notification" data-action="notifications" aria-label="通知"><i data-lucide="bell"></i></button><button class="icon-button" id="settings-open" aria-label="设置"><i data-lucide="settings"></i></button></div>
+    <div class="window-controls"><button id="hide" aria-label="最小化"><i data-lucide="minus"></i></button><button id="fullscreen" aria-label="切换全屏"><i data-lucide="square"></i></button><button id="close" aria-label="关闭窗口"><i data-lucide="x"></i></button></div>
+  </header>
+
+  <div class="room-stage" aria-hidden="true"></div>
+  <aside class="left-column frame-nav-rail" aria-label="功能导航">
+    <nav class="main-nav" aria-label="主导航">
+      <button class="selected" id="conversation-open" data-action="home" aria-current="page" title="聊天" aria-label="聊天"><i data-lucide="message-circle" aria-hidden="true"></i></button>
+      <button data-action="memories" title="回忆"><i data-lucide="book-open"></i><span>回忆</span></button>
+      <button data-action="profile" title="艾莲的档案"><i data-lucide="contact-round"></i><span>档案</span></button>
+      <button id="characters-open" type="button" data-action="characters" title="角色管理" aria-label="角色" aria-controls="character-dialog" aria-haspopup="dialog"><i data-lucide="users-round" aria-hidden="true"></i><span>角色</span></button>      <button id="api-cost-open" type="button" data-action="api-cost" title="API费用与用量" aria-label="API费用" aria-controls="api-cost-dialog"><i data-lucide="chart-column" aria-hidden="true"></i><span><b>API</b>费用</span></button>
+      <button id="feedback-open" type="button" data-action="feedback" title="问题与建议" aria-label="BUG反馈" aria-controls="feedback-dialog"><i data-lucide="bug" aria-hidden="true"></i><span><b>BUG</b>反馈</span></button>
+</nav>
+    <div class="rail-ticket" aria-hidden="true"><svg class="ticket-fin" viewBox="0 0 100 80"><path d="M11 76C23 40 42 13 82 4L68 39 84 44 72 68Z" fill="#353b46" stroke="#f4f4f1" stroke-width="2"/><path d="m59 25-7 27 10 4 5-30" fill="#161a20" stroke="#adb4c0"/></svg><div class="ticket-paper"><i class="ticket-tape"></i><span>偷懒<br>一下</span><i data-lucide="heart"></i><img src="assets/ellen/ellen-icon-badge.svg" alt=""><small>Ellen</small></div></div>
+  </aside>
+
+  <main class="chat-frame conversation" aria-label="与艾莲聊天">
+    <button class="chat-notch chat-drag-handle" type="button" aria-label="移动聊天框，方向键微调，回车复位" title="拖动聊天框 · 双击复位"><span aria-hidden="true">••••••••</span></button>
+    <header class="chat-header"><button class="avatar avatar-chat" data-action="appearance" aria-label="更换头像与背景" aria-haspopup="dialog" aria-controls="appearance-dialog"></button><div class="chat-identity"><div class="chat-title-row"><h1><span data-character-name>艾莲</span><i data-lucide="heart" class="pink-heart"></i></h1><div class="mood-control"><button id="mood-toggle" type="button" aria-expanded="false" aria-controls="mood-details"><span class="mood-dot" aria-hidden="true"></span><span id="mood-label">心情待更新</span></button>
+      <section id="mood-details" popover="manual" aria-labelledby="mood-heading" hidden><header><div><span class="mood-caption">此刻的心情</span><strong id="mood-heading">心情待更新</strong></div><button id="mood-close" type="button" aria-label="收起心情">×</button></header><p id="mood-feeling"></p><p id="mood-reason">聊一会儿，心情会在这里慢慢记下来。</p><p id="mood-change" hidden></p><p id="mood-time"></p><p id="mood-warning" role="status" hidden></p></section>
+    </div></div><p><b class="online-dot"></b><span id="presence-status">正在连接</span></p></div><button class="mini-affinity" data-action="relationship" aria-label="我们的关系"><span><i data-lucide="heart" class="pink-heart"></i><em data-affinity>—</em> / 100</span><span class="meter"><b></b></span><small data-relation-note>慢慢熟悉彼此</small></button><button class="chat-more icon-button" data-action="chat-options" aria-label="更多聊天选项"><i data-lucide="ellipsis"></i></button></header>
+    <div class="chat-toolbar"><button class="chat-focus-toggle" data-action="focus" type="button" aria-pressed="false"><i data-lucide="expand"></i><span>专注聊天</span></button><button class="room-view-toggle" data-action="space" type="button" title="看看房间" aria-label="看看房间"><i data-lucide="image"></i></button><div id="chat-model-picker" class="chat-model-picker" hidden>
+          <button id="chat-model-open" type="button" aria-expanded="false" aria-controls="chat-model-menu" title="切换聊天模型"><i data-lucide="cpu"></i><span id="chat-model-current"></span><i data-lucide="chevron-down"></i></button>
+          <div id="chat-model-menu" class="chat-model-menu" role="group" aria-label="聊天模型" hidden>
+            <label for="chat-model-select">聊天模型</label><div class="model-list-row"><select id="chat-model-select" aria-describedby="chat-model-scope"></select><button id="chat-model-refresh" type="button" title="刷新模型列表" aria-label="刷新模型列表"><i data-lucide="refresh-cw"></i></button></div>
+            <label class="thinking-label" for="chat-thinking-select">思考强度</label><select id="chat-thinking-select" aria-describedby="chat-thinking-note" disabled></select><p id="chat-thinking-note"></p>
+            <p id="chat-model-scope">同时用于日语翻译和记忆整理，声音不变。</p><p id="chat-model-status" role="status" aria-live="polite"></p>
+            <button id="chat-model-settings" type="button"><i data-lucide="settings-2"></i><span>API 设置 / 手动填写</span></button>
+          </div>
+        </div>
+<button id="history-open" type="button" title="历史记录"><i data-lucide="history"></i><span>历史</span></button><button id="new-conversation" type="button" title="开始新对话"><i data-lucide="square-pen"></i></button></div>
+    <div id="model-setup" class="model-setup" hidden><i data-lucide="plug-zap"></i><span id="model-setup-message">连接聊天模型，开始聊天。</span><button id="model-settings-open" type="button">配置 API<i data-lucide="arrow-up-right"></i></button></div>
+    <div id="voice-error" class="error" role="alert" hidden></div><div class="history-note" id="history-note" hidden>正在显示最近的记录。</div>
+    <div class="messages-wrap"><div id="conversation-scroll" role="log" aria-label="对话内容" tabindex="0"><div id="messages" class="messages"></div><section id="voice-captions" hidden></section></div></div>
+    <div id="error" class="error" role="alert" hidden><span id="error-message"></span><button id="retry-reply" type="button" title="重试刚才的消息" aria-label="重试刚才的消息" hidden><i data-lucide="rotate-cw" aria-hidden="true"></i><span>重试</span></button><button id="error-close" type="button" title="关闭提示" aria-label="关闭提示">×</button></div>
+    <section id="token-usage-panel" class="token-usage-panel" aria-label="对话用量统计"></section>
+    <div class="status-line"><span id="status" aria-live="polite">正在准备聊天…</span><span id="composer-context">文字对话</span><button id="latest-message" type="button" title="回到最新消息" hidden>回到最新<i data-lucide="arrow-down"></i></button></div>
+    <form id="composer" class="composer"><label class="sr-only" for="input">想对艾莲说的话</label><textarea id="input" rows="1" maxlength="32000" placeholder="和艾莲聊点什么吧…" aria-label="输入消息" disabled></textarea><div class="compose-actions"><div class="attachment-tools"><button type="button" class="icon-button" data-action="emoji" title="表情" aria-label="表情"><i data-lucide="smile"></i></button><button type="button" id="voice-settings-open" class="icon-button" title="声音设置" aria-label="声音设置"><i data-lucide="sliders-horizontal"></i></button></div><button type="button" id="voice-toggle" class="talk-button" disabled>开始录音</button><button id="voice-mute" type="button" hidden>取消录音</button><button id="stop" type="button" hidden><i data-lucide="square"></i><span>停止回复</span></button><button type="submit" id="send" class="send-button" aria-label="发送消息" disabled><i data-lucide="send"></i><span class="sr-only">发送</span></button></div></form>
+    <div class="voice-detail"><span id="voice-status" aria-live="polite">点击录音 · 停止后可编辑</span></div><div id="activity" class="activity"></div>
+  </main>
+
+  <aside id="life-rail" class="right-column life-rail" aria-label="生活栏">
+    <div class="life-heading"><svg class="life-fin" viewBox="0 0 48 64" aria-hidden="true"><path d="M3 59C12 41 7 14 39 3c-6 21-3 38 6 51L28 52 18 62Z" fill="#777c8c" stroke="#c9ced8" stroke-width="1.2"/><path d="M20 49c7-10 9-25 13-33L27 50Z" fill="#242a34"/></svg><h2 class="sticker-label">日常</h2><button id="life-collapse" type="button" class="round-button" aria-label="收起生活栏"><i data-lucide="chevron-right"></i></button></div>
+    <section class="night-card life-clock" aria-label="现在的时间"><i data-lucide="moon-star" class="night-moon" aria-hidden="true"></i><strong id="clock">--:--</strong><span id="today"></span><span id="day-greeting">歇一会儿</span></section>
+    <div class="life-divider" aria-hidden="true"><i data-lucide="heart"></i><span></span><img src="assets/ellen/ellen-icon-badge.svg" alt=""></div>
+    <section class="milestones-card" aria-labelledby="milestones-heading"><header><h2 id="milestones-heading" class="sticker-label">相处纪念</h2><button id="milestones-open" class="round-button" type="button" aria-label="管理相处纪念" aria-haspopup="dialog" aria-controls="milestone-dialog"><i data-lucide="pencil"></i></button></header><div id="milestone-days"></div><div id="milestone-upcoming"></div></section>
+    <div class="life-divider" aria-hidden="true"><i data-lucide="heart"></i><span></span><i data-lucide="sparkles"></i></div>
+    <section class="life-notes" aria-labelledby="life-notes-title"><header><h2 id="life-notes-title" class="sticker-label">艾莲的便签</h2><small id="ellen-note-date">小纸条</small></header><div class="note-paper"><svg class="note-bow" viewBox="0 0 60 44" aria-hidden="true"><path d="m25 18-9 22 9-3 4 6 4-24m1-1 6 23 4-8 8 2-12-20" fill="#d6a0b4" stroke="#efc5d6" stroke-width="1.2"/><path d="M27 14C17 2 5 2 4 8L7 25q3 6 20-5m7-6C45 3 56 3 56 10l-3 16q-4 5-19-6" fill="#e4b2c9" stroke="#f0c8db" stroke-width="1.2"/><path d="m25 14-13-4m14 8-14 4m23-7 13-5m-13 9 12 4" fill="none" stroke="#b77d99" stroke-width="1.3"/><rect x="25" y="12" width="11" height="12" rx="3" fill="#d49bb8" stroke="#f0c8db"/></svg><svg class="note-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M15 21v-4a2 2 0 0 1 2-2h4M7 8h10M7 12h6"/></svg><p id="ellen-note-text">还没有留下小纸条。</p><span aria-hidden="true">Ellen <i data-lucide="heart"></i></span></div><p id="ellen-note-warning" class="note-warning" role="status" hidden></p></section>
+    <div class="life-divider" aria-hidden="true"><i data-lucide="sparkles"></i><span></span><i data-lucide="moon"></i></div>
+    <div class="life-art" aria-hidden="true"><p>尾巴不许碰。<br>鲨鱼借你抱。<i data-lucide="heart"></i></p><img src="assets/ellen/ellen-shark-hug-a5.png" alt="" draggable="false"></div>
+  </aside>
+  <button id="life-expand" class="life-expand" type="button" aria-label="展开生活栏" aria-controls="life-rail" hidden><i data-lucide="chevron-left"></i><span>日常</span></button>
+  <button class="room-return" type="button" data-action="home"><i data-lucide="message-circle"></i><span>回到聊天</span></button>
+  <footer class="frame-bottom" aria-hidden="true"></footer>
+
+  <div id="toast" role="status" hidden></div>
+  <div id="ui-tooltip" class="ui-tooltip" role="tooltip" hidden></div>
+  <dialog id="panel" aria-labelledby="panel-title"><header><h2 id="panel-title"></h2><button id="close-panel" class="icon-button" aria-label="关闭面板"><i data-lucide="x"></i></button></header><div id="panel-content"></div></dialog>
+
+  <audio id="voice-output" autoplay hidden></audio>
+  <button id="pin" hidden aria-hidden="true" tabindex="-1"></button>
+<dialog id="history-dialog" aria-labelledby="history-title"><header><h2 id="history-title">历史记录</h2><div class="dialog-actions"><button id="refresh" type="button" title="重新连接并读取记录" aria-label="重新连接并读取记录"><img src="assets/journey/icons/refresh-cw.svg" alt=""></button><button id="history-close" type="button" title="关闭历史记录" aria-label="关闭历史记录"><img src="assets/journey/icons/x.svg" alt=""></button></div></header><label class="history-search"><img src="assets/journey/icons/search.svg" alt=""><input id="history-search" type="search" placeholder="查找对话" aria-label="查找对话" autocomplete="off"></label><select id="threads" aria-label="选择已有项目对话" hidden><option>正在读取…</option></select><div id="history-list" aria-label="已有对话"></div><p id="history-empty" hidden>没有找到这段对话。</p></dialog>
+<dialog id="settings-dialog" aria-labelledby="settings-title"><header><h2 id="settings-title">设置</h2><button id="settings-close" type="button" title="关闭设置" aria-label="关闭设置"><img src="assets/journey/icons/x.svg" alt=""></button></header>
+  <div class="client-tabs" role="tablist" aria-label="设置分类"><button id="settings-tab-general" type="button" role="tab" aria-selected="true" aria-controls="settings-general">通用</button><button id="settings-tab-model" type="button" role="tab" aria-selected="false" aria-controls="settings-model" tabindex="-1">聊天模型</button><button id="settings-tab-sound" type="button" role="tab" aria-selected="false" aria-controls="settings-sound" tabindex="-1">声音</button></div>
+  <div id="settings-voice-actions" class="settings-voice-actions" hidden><span id="settings-voice-status" role="status"></span><button id="settings-voice-stop" type="button">停止朗读</button></div>
+  <section id="settings-general" role="tabpanel" aria-labelledby="settings-tab-general"><dl class="connection-details"><div><dt>当前项目</dt><dd id="project">艾莲陪伴伙伴</dd></div><div><dt>连接状态</dt><dd id="badge" class="connection-badge">连接中</dd></div></dl><label class="setting-row" for="setting-pin"><span>窗口置顶</span><input id="setting-pin" type="checkbox"></label><label class="setting-row" for="setting-motion"><span>减少界面动态</span><input id="setting-motion" type="checkbox"></label><div class="settings-links"><button id="updates-open" type="button"><span id="updates-label">检查更新</span></button></div></section>
+  
+  <section id="settings-model" role="tabpanel" aria-labelledby="settings-tab-model" hidden>
+    <div class="model-heading"><div class="model-heading-icon" aria-hidden="true"><i data-lucide="messages-square"></i></div><div><h3>连接聊天模型</h3><p>OpenAI 兼容接口</p></div></div>
+    <div id="model-provider-state" class="model-provider-state" role="status" aria-live="polite" data-phase="loading"><span class="model-state-dot" aria-hidden="true"></span><span id="model-provider-message">正在读取配置</span></div>
+    <form id="model-provider-form" autocomplete="off">
+      <label for="model-base-url">服务地址</label><input id="model-base-url" type="url" inputmode="url" maxlength="2000" required autocomplete="off" spellcheck="false" placeholder="https://api.deepseek.com" aria-describedby="model-url-note" disabled>
+      <p id="model-url-note" class="model-field-note">首次使用已预填 DeepSeek 地址和模型，只需填写 API Key 并保存。使用其他服务时，可修改地址与模型 ID。</p>
+      <div class="model-key-label"><label for="model-api-key">API Key</label><span id="model-key-state">尚未保存</span></div>
+      <div class="secret-field"><input id="model-api-key" type="password" maxlength="4096" autocomplete="new-password" spellcheck="false" autocapitalize="off" aria-describedby="model-key-note" placeholder="填写 API Key" disabled><button id="model-key-reveal" type="button" title="显示输入的密钥" aria-label="显示输入的密钥" aria-pressed="false" disabled><i data-lucide="eye"></i></button></div>
+      <p id="model-key-note" class="model-field-note"><i data-lucide="lock-keyhole"></i>密钥加密保存在本机，不回显已保存的内容。</p>
+      <p id="model-origin-confirm" class="model-origin-confirm" hidden>服务地址已更换，请填写对应服务的 API Key。</p>
+      <label for="model-list">可用模型</label><div class="model-list-row"><select id="model-list" aria-describedby="model-list-status" disabled><option value="">尚未获取模型</option></select><button id="model-list-refresh" type="button" disabled><i data-lucide="refresh-cw"></i><span>获取模型</span></button></div>
+      <p id="model-list-status" class="model-field-note" role="status" aria-live="polite"></p>
+      <label for="model-name">模型 ID</label><input id="model-name" maxlength="200" required autocomplete="off" spellcheck="false" placeholder="从列表选择，或手动填写" disabled>
+      <p class="model-field-note">用于聊天、心情判断、日语翻译和记忆整理；声音配置独立。新消息会增加一次心情判断，软件运行时按当前节奏检查独处心情，均使用此API额度。</p>
+      <label for="model-thinking">思考强度</label><select id="model-thinking" aria-describedby="model-thinking-note model-thinking-scope" disabled></select>
+      <p id="model-thinking-note" class="model-field-note"></p><p id="model-thinking-scope" class="model-field-note">保存后从下一次请求生效，同样用于翻译和记忆整理。心情判断在已适配的DeepSeek型号使用短判断模式；不改动保存的聊天强度。</p>
+      <p id="model-provider-lock" class="model-field-note" role="status" hidden>请先结束当前回复或语音，再修改配置。</p>
+      <p id="model-provider-error" class="model-provider-error" role="alert" hidden></p>
+      <div class="model-actions"><button id="model-provider-save" type="submit" disabled><i data-lucide="check"></i><span>保存配置</span></button><button id="model-provider-check" type="button" disabled><i data-lucide="plug-zap"></i><span>测试连接</span></button><button id="model-provider-retry" type="button" hidden><i data-lucide="refresh-cw"></i><span>重新读取</span></button><button id="model-provider-remove" type="button" title="移除聊天模型配置" aria-label="移除聊天模型配置" disabled><i data-lucide="trash-2"></i></button></div>
+      <p class="model-cost-note">保存不会调用模型。测试连接会使用当前强度发送一条短消息，并消耗 API 额度。</p>
+      <div id="model-remove-confirm" class="model-remove-confirm" hidden><p>移除本机的聊天模型配置？聊天记录与声音配置会保留。</p><div><button id="model-remove-no" type="button">取消</button><button id="model-remove-yes" type="button">移除配置</button></div></div>
+    </form>
+  </section>
+  <section id="settings-sound" role="tabpanel" aria-labelledby="settings-tab-sound" hidden>
+    <div class="provider-heading"><div><h3>MiniMax</h3><span id="provider-region-label">国内站 · api.minimax.cn</span></div><span id="provider-state" role="status" aria-live="polite">正在读取配置</span></div>
+    <p id="provider-active-note" class="provider-note"></p>
+    <form id="provider-form" autocomplete="off">
+      <p id="provider-profile-label" class="provider-note">当前音色：艾莲 · 中文。</p>
+      <label for="provider-key">API Key</label><div class="secret-field"><input id="provider-key" type="password" maxlength="4096" autocomplete="new-password" spellcheck="false" aria-describedby="provider-privacy" placeholder="填写新的 API Key"><button id="provider-reveal" type="button" title="显示输入的密钥" aria-label="显示输入的密钥" aria-pressed="false"><i data-lucide="eye"></i></button></div>
+      <p id="provider-privacy" class="provider-note">密钥仅加密保存在本机；不回显已保存的密钥。</p>
+      <label for="provider-voice">音色 ID</label><input id="provider-voice" maxlength="256" spellcheck="false" required>
+      <div class="provider-fields"><div><label for="provider-model">声音模型</label><select id="provider-model"><option value="speech-2.8-turbo">Speech 2.8 Turbo</option><option value="speech-2.8-hd">Speech 2.8 HD</option></select></div><div><label for="provider-emotion">情绪表达</label><select id="provider-emotion"><option value="auto">自动判断</option><option value="dialogue">跟随对话</option></select></div></div>
+      <p class="provider-note">保存后用于下一次说话。国内首次配置可留空音色 ID，保存 Key 后在下方初始化。</p>
+      <p id="provider-error" role="alert" hidden></p>
+      <button id="provider-task-details" class="provider-task-details" type="button" hidden>查看声音处理进度</button>
+      <div class="provider-actions"><button id="provider-save" type="submit"><i data-lucide="check"></i>保存配置</button><button id="provider-check" type="button"><i data-lucide="refresh-cw"></i>查询音色</button><button id="provider-remove" type="button" title="移除本机密钥" aria-label="移除本机密钥"><i data-lucide="trash-2"></i></button></div>
+      <div id="provider-remove-confirm" hidden><span>移除本机保存的 MiniMax 国内站密钥？</span><button id="provider-remove-yes" type="button">移除</button><button id="provider-remove-no" type="button">取消</button></div>
+    </form>
+    <section id="provider-clone" class="provider-clone" aria-labelledby="provider-clone-title" hidden>
+      <h4 id="provider-clone-title">初始化艾莲声音</h4>
+      <p class="provider-note">保存国内站 API Key 后，点击下方按钮即可设置艾莲声音，音色 ID 会自动填入。</p>
+      <p id="provider-source" class="provider-source"></p>
+      <p class="provider-note">使用软件内置的艾莲原声，无需自己准备音频。MiniMax 账号需完成国内站实名认证。</p>
+      <p class="provider-clone-cost">首次初始化会上传内置原声并创建音色，产生声音复刻及短句试听的 API 费用，具体以 MiniMax 账号套餐为准。</p>
+      <p id="provider-initialize-note" class="provider-note" role="status"></p>
+      <button id="provider-initialize" type="button">初始化并自动保存</button>
+      <p id="provider-prompt" class="provider-note" role="status" aria-live="polite"></p>
+      <p id="provider-clone-id" class="provider-note" hidden></p>
+      <button id="provider-clone-reset" type="button" hidden>重新创建音色…</button>
+      <div id="provider-clone-reset-confirm" hidden><p class="provider-note">仅在原音色已失效或确实需要重做时使用。旧音色不会从平台删除；再次初始化将创建新 ID，并可能再次产生复刻费用。</p><button id="provider-clone-reset-no" type="button">保留现有进度</button><button id="provider-clone-reset-yes" type="button">清除进度，准备重做</button></div>
+    </section>
+    <div class="provider-preview"><button id="provider-preview" type="button">试听当前音色</button><span id="provider-preview-note" class="provider-note">首次试听会合成一小段语音并消耗 API 额度。</span><audio id="provider-preview-audio" controls preload="none" hidden aria-label="艾莲声音试听"></audio></div>
+  </section>
+</dialog>
+<dialog id="provider-task-dialog" aria-labelledby="provider-task-title" aria-describedby="provider-task-summary">
+  <header><div class="provider-task-heading"><span id="provider-task-symbol" aria-hidden="true"></span><h2 id="provider-task-title">正在初始化声音</h2></div><button id="provider-task-close" type="button" aria-label="收起声音提示">×</button></header>
+  <div id="provider-task-body">
+  <p id="provider-task-summary" role="status" aria-live="polite"></p>
+  <div id="provider-task-progress" role="progressbar" aria-label="正在初始化声音" aria-valuetext="处理中，请稍候" hidden><span></span></div>
+  <ol id="provider-task-guidance"></ol>
+  <p id="provider-task-recovery"></p>
+  <details id="provider-task-error-details" hidden><summary>详细错误信息</summary><p id="provider-task-error"></p></details>
+  <p id="provider-task-help-result" role="status" hidden></p>
+  </div>
+  <div class="provider-task-actions"><button id="provider-task-help" type="button" hidden>打开开放平台</button><button id="provider-task-return" type="button" autofocus>收起进度</button></div>
+</dialog>
+<dialog id="updates-dialog" aria-labelledby="updates-title"><header><h2 id="updates-title">软件更新</h2><button id="updates-close" type="button" aria-label="关闭更新窗口">×</button></header><p id="update-version"></p><p id="update-message" role="status" aria-live="polite"></p></dialog>
+
+  <script src="ellen-note.js"></script>
+  <script src="emotion.js"></script>
+  <script src="assets/client/lucide.min.js"></script><script src="ellen-adapter.js"></script><script src="ellen-motion.js"></script><script src="chat-state.js"></script><script src="composer-controls.js"></script><script src="navigation.js"></script><script src="media.js"></script><script src="speech-volume-state.js"></script><script src="speech-volume.js"></script><script src="call-waves.js"></script><script src="ellen-call-window.js"></script><script src="manual-voice.js"></script><script src="lip-sync.js"></script><script src="local-speech.js"></script><script src="translation.js"></script><script src="voice.js"></script><script src="sticker-catalog.js"></script><script src="message-parts.js"></script><script src="stickers.js"></script><script src="token-usage.js"></script><script src="voice-messages.js"></script><script src="message-notifications.js"></script><script src="interface-sounds.js"></script><script src="app.js"></script><script src="ellen-panels.js"></script><script src="ellen-past-notes.js"></script><script src="journal-panel.js"></script><script src="ellen-shell.js"></script><script src="updates.js"></script><script src="voice-failure-guidance.js"></script><script src="voice-provider-settings.js"></script><script src="model-thinking-policy.js"></script><script src="model-settings.js"></script>
+  <script src="ellen-frame.js"></script><script src="ellen-chat-layout.js"></script>
+  <script src="ellen-tab-motion.js"></script>
+  <script src="character-manager.js"></script>
+  <script src="worldbook-manager.js"></script>
+  <script src="appearance.js"></script>
+  <script src="conversation-manager.js"></script><script src="call-history.js"></script>
+  <script src="milestones-model.js"></script><script src="milestones.js"></script>
+  <script src="desktop-controls.js"></script>
+  <script src="background-music.js"></script>
+<script src="api-cost.js"></script><script src="feedback.js"></script><script src="ellen-swim-pet.js"></script><script src="desktop-mini-bridge.js"></script></body></html>

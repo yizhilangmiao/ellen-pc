@@ -1,0 +1,9 @@
+.memory-dialog{width:min(790px,calc(100vw - 32px));max-height:calc(100vh - 36px);color:#eee8ef;background:rgba(39,36,51,.98);border:1px solid #8e697a;border-radius:22px;padding:22px;box-sizing:border-box;overflow:auto}
+.memory-dialog::backdrop{background:rgba(16,17,28,.65)}
+.memory-dialog header{display:flex;align-items:center;justify-content:space-between;gap:15px}.memory-dialog header button{width:auto;min-width:58px;height:36px;white-space:nowrap;padding:5px 12px}.memory-dialog h2{font-size:23px;margin:0}.memory-dialog h3{font-size:16px;margin:0 0 10px}
+.memory-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.memory-tabs .panel-button{flex:1;white-space:nowrap;padding:9px 13px}
+.memory-status{font-size:13px;line-height:1.7;overflow-wrap:anywhere}.memory-status{min-height:23px}
+
+.memory-dialog input,.memory-dialog textarea,.memory-dialog select{box-sizing:border-box;background:#302e3e;color:#f5edf5;border:1px solid #796374;border-radius:8px;padding:10px;font:inherit;max-width:100%}
+.memory-dialog summary{cursor:pointer;line-height:1.7}.memory-dialog button:focus-visible,.memory-dialog summary:focus-visible{outline:2px solid #ffc8e6;outline-offset:3px}
+@media(max-width:760px){.memory-dialog{padding:16px}.memory-tabs .panel-button{flex:1 1 40%}}

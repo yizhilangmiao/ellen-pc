@@ -1,0 +1,9 @@
+/* Preserve each selector's approved material while its marker moves. */
+.journal-tabs.motion-tab-list{position:relative}
+.motion-tab-list>.motion-tab-highlight{position:absolute;pointer-events:none;z-index:0}
+.motion-tab-highlight[hidden]{display:none}
+.journal-tabs.motion-tab-list>.motion-tab-highlight{height:3px;border-radius:4px;background:var(--notebook-accent)}
+body.client-ui .journal-tabs.motion-tab-list [aria-current=true]::after{content:none}
+body.client-ui .ellen-settings .client-tabs.motion-tab-list>button{position:relative;z-index:1}
+body.client-ui .ellen-settings .client-tabs.motion-tab-list [aria-selected=true]{background:transparent}
+.ellen-settings .client-tabs.motion-tab-list>.motion-tab-highlight{border-radius:12px;background:var(--notebook-paper)}

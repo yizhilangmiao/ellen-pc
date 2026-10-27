@@ -1,0 +1,18 @@
+/* The original artwork remains the fallback underneath this local motion layer. */
+.ellen-living-layer { position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity 420ms ease; }
+.ellen-living-layer[data-visible="true"] { opacity:1; }
+.ellen-living-canvas,.ellen-living-dust { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.ellen-living-dust { overflow:hidden; }
+.ellen-living-dust circle { fill:#e7ecf5; opacity:0; animation:ellen-dust-drift var(--drift) linear infinite; animation-delay:var(--offset); }
+@keyframes ellen-dust-drift {
+  0%,100% { opacity:0; transform:translate(0,10px); }
+  20% { opacity:var(--glimmer); }
+  75% { opacity:var(--glimmer); }
+  99% { opacity:0; transform:translate(14px,-25px); }
+}
+.ellen-living-layer[data-running="false"] .ellen-living-dust circle { animation-play-state:paused; }
+.ellen-living-layer[data-visible="false"],html.ellen-intro-active .ellen-living-layer,html.ellen-startup-pending .ellen-living-layer { visibility:hidden; opacity:0; }
+.setting-wallpaper-copy { display:grid; gap:5px; }
+.setting-wallpaper-copy small { color:var(--theme-muted); font-size:12px; font-weight:400; }
+.reduce-ui-motion .ellen-living-layer { visibility:hidden; transition:none; }
+@media(prefers-reduced-motion:reduce) { .ellen-living-layer { visibility:hidden; transition:none; } }

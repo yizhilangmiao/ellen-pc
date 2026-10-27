@@ -1,0 +1,1 @@
+"use strict";const{contextBridge:contextBridge,ipcRenderer:ipcRenderer}=require("electron");contextBridge.exposeInMainWorld("ellenDlc",{request:(e,r)=>ipcRenderer.invoke("ellen:dlc",e,r)});

@@ -1,0 +1,1 @@
+"use strict";const REGIONS=Object.freeze({international:"https://api.minimax.io",china:"https://api.minimax.cn"});function region(n="international"){if(!Object.hasOwn(REGIONS,n))throw Error("请选择国内站或国际站。");return n}function host(n){return REGIONS[region(n)]}module.exports={REGIONS:REGIONS,region:region,host:host};

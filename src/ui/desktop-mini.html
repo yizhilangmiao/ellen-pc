@@ -1,0 +1,25 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'none'; media-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'"><title>艾莲 · 小人模式</title><link rel="stylesheet" href="desktop-mini.css"></head><body>
+ <main id="mini-shell">
+  <div id="thought" hidden role="status"><span id="thought-text"></span><i></i><b></b></div>
+  <section id="chat" class="panel" hidden aria-label="和艾莲聊聊">
+   <header><div><small>ELLEN / 小小聊天窗</small><h1>有事叫我。</h1></div><button class="panel-close" aria-label="收起聊天">×</button></header>
+   <div id="messages" role="log" aria-live="polite"></div>
+   <p class="hint" id="chat-status">和主窗口是同一段聊天</p>
+   <form id="compose"><textarea id="text" maxlength="12000" rows="2" placeholder="和艾莲说点什么…" aria-label="消息"></textarea><button id="send" type="submit" title="发送消息" aria-label="发送消息">↑</button></form>
+  </section>
+  <section id="call" class="panel" hidden aria-label="语音通话">
+   <header><div><small>ELLEN / 糖纸通话</small><h1>喂，听得见吗？</h1></div><button class="panel-close" aria-label="收起通话面板">−</button></header>
+   <div class="call-copy"><span id="call-status" role="status">准备好就叫我。</span><time id="duration">00:00</time></div>
+   <div id="waves"></div>
+   <div class="call-actions"><button id="mute">关闭麦克风</button><button id="hangup">结束通话</button></div>
+  </section>
+  <nav id="tools" aria-label="小人操作">
+   <button id="chat-open" title="聊天" aria-label="聊天"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 1-8 8H5l-3 2V11a9 9 0 0 1 18 0Z"/><path d="M7 10h9M7 14h6"/></svg><span>聊天</span><i id="unread" hidden></i></button>
+   <button id="call-open" title="语音通话" aria-label="语音通话"><svg viewBox="0 0 24 24"><path d="m6 3 4 4-2 3c1 3 3 5 6 6l3-2 4 4-2 3C10 21 3 14 3 6Z"/></svg><span>通话</span></button>
+   <button id="expand" title="展开主窗口" aria-label="展开主窗口"><svg viewBox="0 0 24 24"><path d="M14 3h7v7M21 3l-8 8M10 21H3v-7M3 21l8-8"/></svg><span>展开</span></button>
+  </nav>
+  <button id="mascot" aria-label="小艾莲，拖动可移动，点击戳一下，右键可关闭点击音" title="拖动我换个地方 · 右键小设置"><img src="assets/ellen/ellen-mini-mascot-v1.png" draggable="false" alt="完整小身体与鲨鱼尾巴的小艾莲"></button>
+  <button id="call-badge" hidden aria-label="打开正在进行的通话">通话中 · <span>00:00</span></button>
+  <div id="options" class="panel" hidden><button id="sound" aria-pressed="true">点击音：开</button><div id="sound-choices" aria-label="点击音效，点选试听"></div><p class="sound-note">点选试听 · 通话时静默</p><button id="option-expand">展开主窗口</button></div>
+  <p id="error" role="alert" hidden></p>
+ </main><script src="call-waves.js"></script><script src="mini-poke-lines.js"></script><script src="mini-poke-sounds.js"></script><script src="desktop-mini.js"></script></body></html>

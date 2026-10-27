@@ -1,0 +1,1 @@
+window.companionCharacter={id:"ellen",name:"艾莲"},window.characterMotion={setMouth(){},setMouthFeatures(){},isPainted:()=>!1},window.characterPerformance={conversation(){},voice(){},output(){},resetOutput(){},preview(){}};

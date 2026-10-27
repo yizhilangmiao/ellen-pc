@@ -1,0 +1,23 @@
+.message .message-content.voice-message-content{position:relative;min-width:0;white-space:normal;max-width:calc(100% - 18px);margin-inline-end:18px}
+.voice-message-unread{position:absolute;inset-inline-start:calc(100% + 8px);top:18px;width:8px;height:8px;border-radius:50%;background:#ff5b67;pointer-events:none}
+.voice-message-play{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:44px;min-width:104px;max-width:100%;padding:0 4px;color:inherit;background:transparent;border:0;border-radius:8px;font:inherit;cursor:pointer}
+.voice-message-play[data-length="medium"]{min-width:148px}
+.voice-message-play[data-length="long"]{min-width:190px}
+.voice-message-play svg{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.voice-message-play:hover{color:#f0bfd2}
+.voice-message-play:focus-visible{outline:2px solid #f0bfd2;outline-offset:4px}
+.voice-message-play:disabled{cursor:wait;color:#cbd0d8}
+.voice-message-length{font-variant-numeric:tabular-nums;white-space:nowrap}
+.voice-message-play[data-playing="true"] svg path{animation:voice-message-pulse 900ms ease-in-out infinite}
+.voice-message-play[data-playing="true"] svg path:nth-child(2){animation-delay:120ms}
+.voice-message-play[data-playing="true"] svg path:nth-child(3){animation-delay:240ms}
+.voice-message-transcript{margin-top:10px;padding-top:10px;border-top:1px solid #8d939f;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}
+.voice-message-error,.voice-message-fallback{margin-top:8px;font-size:13px;line-height:1.5;color:#f0bfd2;overflow-wrap:anywhere}
+.voice-message-menu{position:fixed;inset:auto;margin:0;padding:6px;width:188px;box-sizing:border-box;border:1px solid #8d939f;border-radius:12px;background:#20252b;color:#f4f4f1;overflow:hidden}
+.voice-message-menu::backdrop{background:transparent}
+.voice-message-menu button{display:block;width:100%;min-height:44px;padding:8px 12px;text-align:left;background:transparent;color:inherit;border:0;border-radius:8px;font:inherit;cursor:pointer}
+.voice-message-menu button:hover,.voice-message-menu button:focus-visible{background:#353b44;outline:2px solid #d6a0b4;outline-offset:-2px}
+.voice-message-menu button:disabled{color:#aeb4bf;cursor:default;outline:none;background:transparent}
+@keyframes voice-message-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.voice-message-play[data-playing="true"] svg path{animation:none}.voice-message-play[data-playing="true"]{color:#f0bfd2}}
+@media(max-width:780px){.voice-message-play[data-length="long"]{min-width:150px}}

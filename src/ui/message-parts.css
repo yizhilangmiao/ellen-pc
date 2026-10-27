@@ -1,0 +1,6 @@
+/* Layout only: inherit the active character's bubble colors and typography. */
+.message.assistant.message-has-next { margin-bottom: calc(7px * var(--s)); }
+.message.assistant.message-continuation { min-height: 0; }
+.message.assistant.message-continuation::before,
+.message.assistant.message-continuation .message-label,
+.message.assistant.message-has-next .message-time { display: none; }

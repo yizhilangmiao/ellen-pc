@@ -1,0 +1,1 @@
+module.exports=Object.freeze({required:!1,publicKey:"-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA8dp0l2WKS3HmLV7QTUjuBRp1EpmbqahRdnJJ+wPwLlE=\n-----END PUBLIC KEY-----\n"});

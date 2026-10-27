@@ -1,0 +1,1 @@
+const{contextBridge:contextBridge,ipcRenderer:ipcRenderer}=require("electron");contextBridge.exposeInMainWorld("desktopMini",{invoke:e=>ipcRenderer.invoke("desktop-mini:action",e),subscribe:e=>{const n=(n,i)=>e(i);return ipcRenderer.on("desktop-mini:event",n),()=>ipcRenderer.removeListener("desktop-mini:event",n)}});

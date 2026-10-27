@@ -1,0 +1,6 @@
+{
+  "name": "ellen-character-import-dependencies",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": { "yaml": "2.9.1" }
+}

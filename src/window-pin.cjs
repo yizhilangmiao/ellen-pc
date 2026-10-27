@@ -1,0 +1,1 @@
+"use strict";function applyWindowPin(p,n,o=process.platform){p.setAlwaysOnTop(n),n&&"win32"===o&&!p.isAlwaysOnTop()&&p.setAlwaysOnTop(!0,"pop-up-menu")}module.exports={applyWindowPin:applyWindowPin};

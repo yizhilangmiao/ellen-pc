@@ -1,0 +1,7 @@
+#updates-dialog{box-sizing:border-box;width:min(620px,calc(100vw - 32px));padding:24px;color:#f4f1ed;background:#232831;border:1px solid #9ca1ab80;border-radius:18px;max-height:calc(100dvh - 40px);overflow:auto}
+#updates-dialog header{display:flex;align-items:center;justify-content:space-between;gap:12px}#updates-dialog h2{margin:0;font-size:22px}
+#update-version,#update-size{color:#bac2cc;font-size:13px}#update-message{overflow-wrap:anywhere}#update-notes{white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#151a2180;border-radius:10px;max-height:240px;overflow:auto}
+#update-progress{width:100%;height:10px;accent-color:#d994af}#updates-dialog .update-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:22px}
+#updates-dialog .update-actions button{padding:9px 16px;border:1px solid #aab1ba70;border-radius:10px;background:#ffffff0b;color:inherit}#updates-dialog .update-actions button:disabled{opacity:.45}#updates-dialog #update-install{background:#e2adc3;color:#26212a}
+#updates-dialog [hidden]{display:none!important}
+#update-background-status{position:fixed;right:24px;top:76px;z-index:60;max-width:calc(100vw - 48px);padding:9px 14px;border:1px solid #d994af88;border-radius:18px;color:#f4f1ed;background:#32313e;box-shadow:0 3px 14px #0003;cursor:pointer;font-size:13px}#update-background-status[hidden]{display:none!important}

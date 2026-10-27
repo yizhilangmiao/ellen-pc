@@ -1,0 +1,45 @@
+/* A finite opening, aligned with the approved 1585 × 992 wallpaper. */
+.ellen-intro {
+  position: fixed; inset: 0; z-index: 80; overflow: hidden;
+  background: #080b10; color: #f4f4f1; isolation: isolate;
+}
+.ellen-intro-scene {
+  position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px);
+  pointer-events: none;
+}
+.ellen-intro-surround { position:absolute; inset:0; pointer-events:none; background:url('assets/ellen/room-approved-night-v1.png') center center/cover no-repeat; opacity:.04; }
+.ellen-intro-halo { position: absolute; inset: 0; opacity: .3; background: radial-gradient(ellipse at 36% 38%,#c4d8f416,transparent 49%),radial-gradient(ellipse at 79% 15%,#d6a0b410,transparent 38%); }
+.ellen-intro-room,.ellen-intro-portrait { opacity: 0; }
+.ellen-intro-traces { fill: none; stroke: #e9effa; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px #c5dafa90); }
+.ellen-intro-traces path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.ellen-intro-origin { fill: #e9effa; opacity: .8; filter: drop-shadow(0 0 6px #c5dafa); }
+.ellen-intro-traces .accent { stroke: #e0a5bc; stroke-width: 1.1; }
+.ellen-intro-spark { opacity: 0; fill: #e8deeb; }
+.ellen-intro-vignette { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at 42% 40%,transparent 16%,#080b101f 52%,#080b1080 100%),linear-gradient(0deg,#080b1070,transparent 38%); }
+.ellen-intro-title { position: absolute; left: 50%; top: 50%; width: min(300px,54vw); transform: translate(-50%,-50%); text-align: center; pointer-events: none; }
+.ellen-intro-name { display: block; width: 100%; height: auto; opacity: 0; filter: drop-shadow(0 2px 20px #090b13); }
+.ellen-intro-greeting { position: absolute; top: 100%; left: 0; right: 0; margin: 13px 0 0; color: #ece7ed; font-size: clamp(14px,1.25vw,19px); letter-spacing: .25em; text-shadow: 0 2px 12px #000; opacity: 0; }
+.ellen-intro-thread { position: absolute; top: calc(100% + 46px); left: 0; right: 0; width: 180px; height: 26px; margin: 0 auto; opacity: 0; }
+.ellen-intro-thread svg { display: block; width: 100%; height: 100%; fill: none; stroke: #d6a0b4; stroke-width: 1.25; }
+.ellen-intro-skip { position: absolute; right: max(26px,env(safe-area-inset-right)); bottom: max(26px,env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 12px; padding: 9px 15px; border-radius: 18px; border: 1px solid #ffffff36; color: #e0e1e5; background: #1013199c; font-size: 12px; cursor: pointer; }
+.ellen-intro-skip kbd { border: 1px solid #ffffff26; border-radius: 4px; padding: 0 4px; font: inherit; font-size: 10px; color: #b4b7bf; }
+.ellen-intro-skip:hover { border-color: #d6a0b49c; background: #242830; }
+.ellen-intro-skip:focus-visible { outline: 2px solid #d6a0b4; outline-offset: 4px; }
+html.ellen-intro-active .wallpaper { transform: none !important; }
+html.ellen-intro-active .motion-moonlight { animation-play-state: paused; }
+html.ellen-intro-active .ellen-ui>.topbar,
+html.ellen-intro-active .ellen-ui>.left-column,
+html.ellen-intro-active .ellen-ui>.chat-frame,
+html.ellen-intro-active .ellen-ui>.right-column{ opacity: 0; }
+.ellen-intro-leaving { pointer-events: none; }
+.ellen-intro-leaving .ellen-intro-skip { display: none; }
+.setting-intro-copy { display: grid; gap: 5px; }
+.setting-intro-copy small { color: var(--theme-muted); font-size: 12px; font-weight: 400; }
+@media (max-width: 740px) {
+  .ellen-intro-title { width: 210px; }
+  .ellen-intro-skip { right: 18px; bottom: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ellen-intro { display: none; }
+  html.ellen-intro-active .ellen-ui>:is(.topbar,.left-column,.chat-frame,.right-column) { opacity: 1; }
+}

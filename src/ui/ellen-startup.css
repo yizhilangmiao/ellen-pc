@@ -1,0 +1,4 @@
+/* Applied in the document head, before deferred scripts can expose the home screen. */
+html.ellen-startup-pending,
+html.ellen-startup-pending body { background: #080b10 !important; }
+html.ellen-startup-pending body > :not(.ellen-intro) { visibility: hidden !important; }

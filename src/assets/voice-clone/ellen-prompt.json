@@ -1,0 +1,45 @@
+{
+  "preference": "主选",
+  "audioFile": "ellen-prompt.wav",
+  "textFile": "ellen-prompt.txt",
+  "prompt_text": "考试挂科的话会很麻烦…能一次性通过当然是最好的。",
+  "seconds": 5.01475,
+  "bytes": 481460,
+  "sampleRate": 48000,
+  "channels": 1,
+  "sampleWidthBytes": 2,
+  "peak": 0.665313720703125,
+  "rms": 0.11857114018745393,
+  "clippedSamples": 0,
+  "source": "音频素材\\20-绝区零角色原声-ZenlessVoice-20260928\\中文\\艾莲\\ellen\\75b3c168e6828b11.wav",
+  "sourceMetadata": "音频素材\\20-绝区零角色原声-ZenlessVoice-20260928\\中文\\艾莲\\ellen\\75b3c168e6828b11.json",
+  "inGameFilename": "Chinese(PRC)/ex/VO_Galgame/Ver1_5/VO_Ellen/GalGame_ChapterEllen_Ellen_030_004.wem",
+  "alreadyInMainMaterial": "上传音频/艾莲/艾莲-中文-02.wav",
+  "sourceSha256": "8df426fdcefe16a882cf60e9b3c34a85f35fe6f7a6fc750bd292fc907024246e",
+  "outputSha256": "8df426fdcefe16a882cf60e9b3c34a85f35fe6f7a6fc750bd292fc907024246e",
+  "processing": "Byte-identical copy of one complete original utterance; no trimming, concatenation, resampling, gain, or noise reduction.",
+  "historicalQualityMetrics": {
+    "SIG": 3.7172689304875686,
+    "BAK": 4.21244174213199,
+    "OVRL": 3.4840801442643246,
+    "windows": 2
+  },
+  "asr": {
+    "engine": "faster-whisper-large-v3-turbo, local CPU int8",
+    "initialPrompt": null,
+    "text": "考试挂科的话会很麻烦,能一次性通过当然是最好的。",
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 4.68,
+        "text": "考试挂科的话会很麻烦,能一次性通过当然是最好的。",
+        "avg_logprob": -0.03214643623393316,
+        "no_speech_prob": 2.047434791152547e-11
+      }
+    ],
+    "matchesAfterRemovingPunctuation": true
+  },
+  "humanListeningApproved": false,
+  "uploaded": false,
+  "integration": "Default main material only; custom sources do not use the built-in Ellen prompt."
+}

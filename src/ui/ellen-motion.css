@@ -1,0 +1,52 @@
+/* The approved motion layer is independent of the character's palette and content. */
+.ellen-ui .wallpaper { inset: -6px; }
+.motion-moonlight { position: fixed; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(ellipse at 80% 9%,#dfe8ff26,transparent 49%); opacity: .22; animation: ellen-moon 7s ease-in-out infinite; }
+@keyframes ellen-moon { 0%,100% { opacity: .18; } 50% { opacity: .62; } }
+.motion-paused .motion-moonlight { animation-play-state: paused; }
+.motion-wait-row { padding: 8px 0 8px calc(55px * var(--s)); }
+.message-content.motion-waiting { display: flex; gap: 6px; align-items: center; min-width: 52px; min-height: 36px; }
+.motion-waiting>span { width: 5px; height: 5px; border-radius: 50%; background: var(--theme-muted); animation: ellen-dot 1.05s ease-in-out infinite; }
+.motion-waiting>span:nth-child(2) { animation-delay: .12s; }
+.motion-waiting>span:nth-child(3) { animation-delay: .24s; }
+@keyframes ellen-dot { 0%,60%,100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-4px); opacity: 1; } }
+.motion-voice-wave { display: inline-flex; align-items: center; gap: 3px; height: 16px; margin-right: 8px; vertical-align: middle; }
+.motion-voice-wave[hidden] { display: none; }
+.motion-voice-wave i { display: block; width: 3px; height: 14px; border-radius: 2px; background: var(--theme-accent); transform: scaleY(.2); transition: transform 80ms linear; }
+.ellen-ui.busy #status { visibility: hidden; }
+/* Hover C: the card and its copy stay anchored; only the icon and arrow respond. */
+.ellen-ui .quick-card .quick-icon { transition: transform 200ms ease-out,background-color 200ms ease-out; }
+.ellen-ui .quick-card .quick-icon svg,.ellen-ui .quick-card .chevron { transition: transform 180ms ease-out,color 180ms ease-out; }
+.ellen-ui .quick-card:not(:disabled):is(:hover,:focus-visible) .quick-icon { transform: translateX(3px) rotate(-5deg); background: color-mix(in srgb,var(--theme-accent) 14%,transparent); }
+.ellen-ui .quick-card:not(:disabled):is(:hover,:focus-visible) .quick-icon svg { color: var(--theme-accent); }
+.ellen-ui .quick-card:not(:disabled):is(:hover,:focus-visible) .chevron { transform: translateX(5px); color: var(--theme-accent); }
+.ellen-ui #send:not(:disabled):is(:hover,:focus-visible)>svg { transform: translateY(-2px); }
+/* Bubble B + C: short spring on the surface, independent silver overlay fading once. */
+.ellen-ui .message .message-content { position: relative; border-radius: calc(12px * var(--s)); padding: calc(11px * var(--s)) calc(14px * var(--s)); line-height: 1.7; }
+.ellen-ui .message.assistant .message-content { background: color-mix(in srgb,var(--theme-panel) 98%,var(--theme-white)); border-color: var(--theme-edge-strong); transform-origin: left bottom; }
+.ellen-ui .message.assistant .message-content::after { content: ''; position: absolute; inset: -1px; border: 1px solid var(--theme-white); border-radius: inherit; pointer-events: none; opacity: 0; }
+.ellen-ui .message-content.motion-bubble-arriving { animation: ellen-bubble-spring 340ms ease-out; }
+.ellen-ui .message-content.motion-bubble-arriving::after { animation: ellen-bubble-silver 600ms ease-out; }
+@keyframes ellen-bubble-spring { 0% { opacity: .4; transform: translateY(5px) scale(.96); } 65% { opacity: 1; transform: translateY(-1px) scale(1.012); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes ellen-bubble-silver { 0% { opacity: .75; } 55% { opacity: .45; } 100% { opacity: 0; } }
+html[data-input=keyboard] .ellen-ui button :is(svg,.quick-icon) { transition: none !important; }
+.ellen-ui.reduce-ui-motion button :is(svg,.quick-icon) { transform: none !important; }
+.ellen-ui.reduce-ui-motion .motion-bubble-arriving,.ellen-ui.reduce-ui-motion .motion-bubble-arriving::after { animation: none !important; }
+/* Native dialog focus/escape handling remains intact, including the exit transition. */
+.ellen-ui dialog { opacity: 0; transform: translateX(76px); transition: opacity 180ms ease-out,transform 260ms cubic-bezier(.2,.8,.25,1),display 260ms allow-discrete,overlay 260ms allow-discrete; }
+.ellen-ui dialog[open] { opacity: 1; transform: translateX(0); }
+.ellen-ui dialog::backdrop { background-color: #05070b00; transition: background-color 220ms,display 260ms allow-discrete,overlay 260ms allow-discrete; }
+.ellen-ui dialog[open]::backdrop { background-color: #05070b70; }
+@starting-style {
+  .ellen-ui dialog[open] { opacity: 0; transform: translateX(76px); }
+  .ellen-ui dialog[open]::backdrop { background-color: #05070b00; }
+}
+.reduce-ui-motion .motion-moonlight { animation: none; opacity: .25; }
+.reduce-ui-motion .motion-waiting>span { animation: none; opacity: .7; }
+.reduce-ui-motion dialog,.reduce-ui-motion dialog::backdrop { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .ellen-ui button :is(svg,.quick-icon) { transform: none !important; transition: none !important; }
+  .ellen-ui .motion-bubble-arriving,.ellen-ui .motion-bubble-arriving::after { animation: none !important; }
+  .motion-moonlight { animation: none; opacity: .25; }
+  .motion-waiting>span { animation: none; opacity: .7; }
+  .ellen-ui dialog,.ellen-ui dialog::backdrop { transition: none !important; }
+}

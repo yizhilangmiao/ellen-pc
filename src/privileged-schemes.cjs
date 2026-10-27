@@ -1,0 +1,1 @@
+"use strict";const{protocol:protocol}=require("electron");let registered=!1;function register(){registered||(protocol.registerSchemesAsPrivileged([{scheme:"companion-media",privileges:{standard:!0,secure:!0,supportFetchAPI:!0,stream:!0}},{scheme:"companion-appearance",privileges:{standard:!0,secure:!0}}]),registered=!0)}module.exports={register:register};

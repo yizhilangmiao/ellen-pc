@@ -1,0 +1,48 @@
+{
+  "source": [
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-01.wav",
+      "sha256": "045045f4608a6e1932984e3d77f8ef95d7c7e390f8c1b39a8267860fe10d5694"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-02.wav",
+      "sha256": "7343fde0c4a450398d8e97cc4419aacabcc4e781248f194a4e5c109445b58326"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-03.wav",
+      "sha256": "ab489daef67ff9e59ab204ab421021eb637e9b35eb0378b143c48b694bf05571"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-04.wav",
+      "sha256": "7798182ebf6304ea56ab3c6afc73858e38f6a4d02ad2de623a30d9e67dc95a3f"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-05.wav",
+      "sha256": "63c2042d5d38eba1264193b0987de8890a28bdd2b36df82ef48346b1bcf34b84"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-06.wav",
+      "sha256": "f5226a813c823cda6688c3181e9f500bf7e1339f5dd937321d9e1144da9e8a0c"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-07.wav",
+      "sha256": "5259e6ed49f8cbe6bda2497cbd394ed91867cb0f15a2dd728e830225ee37909e"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-08.wav",
+      "sha256": "2360cb40d3d387beb76b1052ee958e9a928c74a3b41e82e9a7b5be205b2f9b29"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-09.wav",
+      "sha256": "205c00922e47222f885dffa1062ab8047665a091f4af2c4d39172ab730c5da41"
+    },
+    {
+      "path": "音频素材\\21-MiniMax角色合并-20260928\\上传音频\\艾莲\\艾莲-中文-10.wav",
+      "sha256": "97de3239d8f6c96355d30aa40c54071fa235e00ff8a36b0d8c31c5fd8eef4f95"
+    }
+  ],
+  "conversion": "Concatenate in filename order; resample 48kHz to 32kHz; mono PCM16 WAV; no normalization or trimming",
+  "seconds": 297.6395625,
+  "bytes": 19048976,
+  "sha256": "2a37e1179baf58d55e6a5e930ffb83804a9ee642c0edc0c5c8219431e1473d3c"
+}

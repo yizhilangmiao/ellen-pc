@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'self'; script-src 'self'; form-action 'none'; base-uri 'none'">
+<title>框选截图</title><link rel="stylesheet" href="screenshot.css"></head>
+<body><img id="screen" alt="当前屏幕" draggable="false">
+<div id="shade"></div><div id="selection" hidden><span id="size"></span></div>
+<div id="hint" role="status">拖拽框选要发送的区域 <span>Esc 取消</span></div>
+<div id="tools" hidden><span>双击 / Enter 确认</span><button id="reset" type="button">重选</button><button id="cancel" type="button">取消</button><button id="confirm" type="button">完成截图</button></div>
+<script src="screenshot.js"></script></body></html>

@@ -1,0 +1,1 @@
+module.exports=Object.freeze({baseURL:"https://ellen-updates-1410769069.cos.ap-guangzhou.myqcloud.com/dlc/"});

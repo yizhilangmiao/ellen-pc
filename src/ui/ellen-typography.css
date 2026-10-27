@@ -1,0 +1,31 @@
+/* User selected C, ZCOOL KuaiLe. Keep the approved layout and SVG wordmark. */
+@font-face {
+  font-family: 'Ellen KuaiLe';
+  src: url('assets/client/ZCOOLKuaiLe-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+:root {
+  --ui: 'Ellen KuaiLe', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  font-family: var(--ui);
+}
+body.ellen-ui,
+.ellen-ui button,
+.ellen-ui input,
+.ellen-ui textarea,
+.ellen-ui select,
+.journal-page h3,
+.journal-signature,
+.ellen-identity h2,
+.night-card blockquote,
+body.client-ui .model-heading h3 {
+  font-family: var(--ui);
+}
+/* The single-weight face stays crisp; hierarchy comes from size and spacing. */
+body.ellen-ui { font-synthesis: none; }
+.ellen-ui .message .message-content,
+.message-translation { line-height: 1.8; }
+.journal-page h3 { line-height: 1.5; }
+.journal-prose { line-height: 1.95; letter-spacing: .02em; }
+.ellen-profile-description { line-height: 1.9; }

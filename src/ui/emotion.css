@@ -1,0 +1,16 @@
+.chat-title-row{display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:wrap}
+.chat-title-row h1{margin:0;min-width:0}
+.mood-control{position:relative;flex:0 0 auto;align-self:center;-webkit-app-region:no-drag}
+#mood-toggle{display:flex;align-items:center;gap:7px;min-height:30px;padding:5px 10px;border:1px solid #cfb4c42e;border-radius:18px;background:#25222bcf;color:#e0cddc;font:inherit;font-size:12px;white-space:nowrap;cursor:pointer}
+#mood-toggle:hover,#mood-toggle:focus-visible{border-color:#e3b4cb;background:#3c2c3d;outline-offset:3px}
+.mood-dot{width:6px;height:6px;border-radius:50%;background:#9e9cba}
+#mood-toggle[data-tone=joy] .mood-dot,#mood-toggle[data-tone=anticipation] .mood-dot{background:#edcb87}
+#mood-toggle[data-tone=warmth] .mood-dot,#mood-toggle[data-tone=sweetness] .mood-dot{background:#f0a5c7}
+#mood-toggle[data-tone=anger] .mood-dot,#mood-toggle[data-tone=jealousy] .mood-dot{background:#dc938e}
+#mood-toggle[data-tone=sadness] .mood-dot,#mood-toggle[data-tone=hurt] .mood-dot{background:#a8b6e4}
+#mood-toggle.updating .mood-dot{animation:mood-breathe 1.8s ease-in-out infinite}
+#mood-details{position:fixed;inset:auto;margin:0;z-index:150;width:min(310px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow-y:auto;padding:18px;background:#201e2af5;border:1px solid #cbb2ce42;border-radius:16px;box-shadow:0 14px 40px #0008;color:#ede3ed;line-height:1.6;text-align:left;white-space:normal;cursor:auto;user-select:text;touch-action:auto}
+#mood-details[hidden]{display:none}#mood-details header{display:flex;align-items:center;justify-content:space-between;gap:16px}.mood-caption{display:block;color:#bfb2c9;font-size:11px;margin-bottom:2px}#mood-heading{font-size:18px}#mood-close{border:0;background:transparent;color:inherit;font-size:22px;cursor:pointer;line-height:1;padding:3px 5px}#mood-feeling{font-size:14px;margin:14px 0 9px}#mood-reason{font-size:13px;color:#d5c7da;margin:9px 0;overflow-wrap:anywhere}#mood-change,#mood-warning,#mood-time{font-size:12px;color:#bfb2c9;margin:8px 0}#mood-time{color:#968d9f}#mood-warning{color:#edcba2}
+@keyframes mood-breathe{50%{opacity:.35}}
+#mood-details p{max-width:none;white-space:normal;margin-inline:0}
+@media(prefers-reduced-motion:reduce){#mood-toggle.updating .mood-dot{animation:none}}

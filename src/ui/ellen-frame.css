@@ -1,0 +1,123 @@
+/* A5: stable frame, quiet center, character stationery on the living rail. */
+:root{--frame-top:74px;--frame-left:clamp(104px,8.6vw,150px);--frame-life:clamp(176px,12vw,218px);--frame-bottom:clamp(14px,3.4vh,34px);--room-right:calc(var(--frame-life) + 5px);--frame-ink:#f4f4f1;--frame-edge:#aeb4bf66;--frame-ground:#15191e}
+body.framed-ui{background:var(--frame-ground);overflow:hidden}
+.framed-ui::after{content:"";position:fixed;inset:1px;pointer-events:none;border:1px solid #818b9866;border-radius:10px;z-index:25}
+.framed-ui :is(button,input,textarea,select):focus-visible{outline:2px solid #e5bacb;outline-offset:3px}
+.framed-ui ::selection{background:#d6a0b4;color:#15191e}
+.framed-ui input,.framed-ui textarea{caret-color:#e5bacb}
+.framed-ui .topbar{position:fixed;inset:1px 1px auto;height:calc(var(--frame-top) - 1px);padding:0 18px;gap:14px;display:flex;align-items:center;background:#151a20f5;border-bottom:1px solid var(--frame-edge);z-index:7;-webkit-app-region:drag}
+.framed-ui .topbar :is(button,a,input,form){-webkit-app-region:no-drag}
+.framed-ui .brand{order:1;flex:0 0 148px;width:148px;min-width:0;margin:0}
+.framed-ui .brand .ellen-brand-logo{width:148px;height:48px;max-width:none}
+.frame-page-heading{order:2;display:flex;align-items:center;gap:22px;border-left:1px solid #e8e9ed90;padding-left:26px;flex:1;min-width:0;white-space:nowrap}
+.frame-page-heading strong{font-size:23px;font-weight:400}
+.frame-page-heading>span{font-size:19px;color:#d8d9df;overflow:hidden;text-overflow:ellipsis}
+.frame-page-heading>svg{width:20px;stroke:#d6a0b4;flex:none}
+.frame-call-slot{order:3;flex:0 0 auto;min-width:0}
+.framed-ui .profile-switch{order:5;width:auto;min-width:0;margin:0 0 0 auto;padding:0;gap:0}.framed-ui .profile-switch>[data-character-name],.framed-ui .profile-switch>.pink-heart{display:none}
+.framed-ui .avatar-top{--avatar-size:48px}
+.framed-ui .top-tools{order:6;flex:0 0 auto;width:auto;margin:0;gap:8px}.framed-ui .top-tools .icon-button{width:34px;height:38px}.framed-ui .top-tools svg{width:24px;height:24px}
+.framed-ui .window-controls{order:7;width:108px;flex:0 0 108px;height:100%;margin:0}.framed-ui .window-controls button{min-width:32px}.framed-ui .window-controls svg{width:18px;height:18px}
+/* Keep the artwork behind the living rail; reading panels must not resize its crop. */
+.framed-ui .wallpaper,.framed-ui .wallpaper-shade{position:fixed;inset:var(--frame-top) 12px var(--frame-bottom) var(--frame-left);border-radius:12px;background-size:cover;background-position:center center;overflow:hidden}
+.framed-ui .wallpaper{transform:scale(1.015)}
+html.ellen-intro-active body.framed-ui .wallpaper{transform:scale(1.015)!important}
+.framed-ui .ellen-intro-scene{inset:0;width:100%;height:100%;transform:none;border-radius:0}
+.framed-ui .motion-moonlight{inset:var(--frame-top) 12px var(--frame-bottom) var(--frame-left);border-radius:12px}
+.room-stage{position:fixed;inset:var(--frame-top) var(--room-right) var(--frame-bottom) var(--frame-left);border:1px solid var(--frame-edge);border-radius:12px;pointer-events:none;z-index:1}
+.frame-bottom{position:fixed;inset:auto 2px 2px;height:calc(var(--frame-bottom) - 2px);background:#151a20f2;border-top:1px solid #9aa4b130;border-radius:0 0 8px 8px;pointer-events:none;z-index:3}
+.framed-ui .left-column{position:fixed;left:1px;top:var(--frame-top);bottom:var(--frame-bottom);width:calc(var(--frame-left) - 2px);height:auto;padding:30px 11px 12px;display:flex;gap:0;background:#151a20ee;border:0;z-index:4}
+.rail-ticket{position:relative;width:90%;max-width:112px;margin:auto auto 14px;transform:rotate(-7deg);pointer-events:none;flex:none}
+.ticket-fin{width:100%;height:75px;display:block;margin-bottom:-17px}
+.ticket-paper{position:relative;display:flex;align-items:center;flex-direction:column;border:1px solid #efefeb;border-radius:2px;padding:25px 8px 12px;background:#1b2228;gap:8px}
+.ticket-paper>span{font-size:27px;line-height:1.45;text-align:center}.ticket-paper>svg{width:23px;height:23px;color:#d6a0b4}.ticket-paper>img{width:44px;height:44px;opacity:.76}.ticket-paper>small{font-size:18px;color:#aeb4bf;font-style:italic}
+.ticket-tape{position:absolute;left:-7px;top:1px;width:46px;height:14px;background:#d6a0b4;transform:rotate(22deg);opacity:.94}
+.framed-ui .right-column{position:fixed;inset:var(--frame-top) 2px var(--frame-bottom) auto;width:var(--frame-life);height:auto;padding:18px 12px 0;display:flex;flex-direction:column;gap:0;background:#151b20f5;border:1px solid var(--frame-edge);border-radius:20px 20px 12px 12px;z-index:4;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#929caa55 transparent}
+.life-heading,.life-notes header{display:flex;align-items:center;justify-content:space-between;gap:5px;flex:none}
+.life-heading{margin-bottom:12px;padding-left:1px}
+.sticker-label{display:inline-flex;width:max-content;max-width:100%;align-items:center;color:#192029;background:#f4f1ef;border:1px solid #e7b4c440;border-radius:19px 14px 18px 10px;padding:8px 10px;margin:0;font-size:17px;font-weight:400;line-height:1.15;white-space:nowrap}
+.life-heading .sticker-label{font-size:25px;padding:8px 17px;transform:rotate(-3deg)}
+.framed-ui .right-column .round-button{width:29px;height:29px;flex:none;background:#20262c;border:1px solid #b9c0cc70;color:#f4f4f1}
+.framed-ui .night-card{position:relative;width:100%;height:auto;display:flex;flex-direction:column;align-items:flex-start;padding:8px 8px 2px;margin:0;gap:7px;background:none;border:0;box-shadow:none;flex:none}
+.framed-ui .night-card .night-moon{position:absolute;color:#f2f2ef}
+.framed-ui .night-card #clock{font-size:38px;font-weight:400;line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.framed-ui .night-card #today{font-size:17px;line-height:1.65;max-width:100%;white-space:normal}
+.framed-ui #day-greeting{font-size:13px;color:#c9cbd1}
+.life-divider{display:flex;align-items:center;gap:6px;height:29px;min-height:29px;margin:7px 0;color:#d6a0b4;pointer-events:none}
+.life-divider>span{flex:1;border-top:2px dotted #d8dae17d}.life-divider>svg{width:15px;height:15px}.life-divider>svg:first-child{fill:#d6a0b4}.life-divider>img{width:28px;height:25px;object-fit:contain;opacity:.65;transform:rotate(-14deg)}
+.life-notes{flex:none}.life-notes header>small{font-size:11px;padding:3px 5px;background:#ffffff0e;border-radius:8px;color:#c8cdd5}
+.note-paper{position:relative;display:grid;grid-template-columns:24px 1fr;gap:10px;margin-top:13px;border:1px solid #e2e4e8bc;border-radius:15px 15px 20px 15px;padding:21px 11px 10px;min-height:110px;transform:rotate(-1deg)}
+.note-paper>svg{width:23px;height:23px}.note-paper p{font-size:14px;line-height:1.65;margin:0}.note-paper>span:last-child{grid-column:1/-1;justify-self:end;display:flex;gap:4px;align-items:center;color:#aeb7c4;font-size:17px;font-style:italic}.note-paper>span:last-child svg{width:11px;height:11px;fill:#d6a0b4;stroke:#d6a0b4}
+.note-paper>.note-symbol{color:#e5bacb;transform:rotate(-6deg)}
+.note-paper>.note-bow{position:absolute;right:0;top:-12px;width:49px;height:36px;transform:rotate(12deg);pointer-events:none}
+.note-paper #ellen-note-text{max-height:6.6em;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap;scrollbar-width:thin;scrollbar-color:#798290 transparent}
+.life-notes .note-paper>.note-bow{top:-16px;transform:rotate(12deg) scale(.9)}
+.note-warning{font-size:11px;line-height:1.5;color:#efc5d6;margin:7px 0 0}
+.life-art{position:relative;display:flex;flex:1 0 200px;min-height:200px;flex-direction:column;justify-content:flex-end;margin:0 -8px;pointer-events:none}
+.life-art>p{font-size:20px;line-height:1.5;transform:rotate(-6deg);margin:0 12px -9px;color:#edecf0;z-index:1}.life-art>p svg{width:23px;height:23px;fill:#d6a0b4;stroke:none;vertical-align:middle;margin-left:7px}
+.life-art>img{display:block;width:100%;height:auto;max-height:235px;object-fit:contain;object-position:center bottom;margin-top:-7px}
+.life-expand{position:fixed;right:7px;top:calc(var(--frame-top) + 12px);z-index:5;width:30px;min-height:82px;display:flex;flex-direction:column;align-items:center;gap:9px;padding:10px 3px;border:1px solid var(--frame-edge);background:#1e252ded;border-radius:12px;color:#f4f4f1;font-size:14px}.life-expand svg{width:18px;height:18px}.life-expand span{writing-mode:vertical-rl}
+body.framed-ui.life-collapsed{--room-right:44px}.framed-ui.life-collapsed .right-column{display:none!important}
+.framed-ui.focus-chat .left-column,.framed-ui.focus-chat .right-column{display:flex}
+.framed-ui.scene-only .left-column,.framed-ui.scene-only .right-column{display:flex}
+.framed-ui .chat-frame[data-chat-layout]{padding:18px 18px 12px;border-width:2px;border-color:#d4d7ddae;border-radius:22px;background:linear-gradient(130deg,#1d242ce8,#1c2229d4);box-shadow:inset 0 0 0 1px #ffffff24;backdrop-filter:blur(15px)}
+.framed-ui .chat-frame .chat-header{min-height:88px;padding:9px 3px 15px;gap:17px}.framed-ui .chat-more{position:static;margin-left:12px;flex:none;width:32px;height:29px}
+.framed-ui .mini-affinity{width:auto;min-width:60px;margin-left:auto;align-self:center}.framed-ui .mini-affinity small{font-size:13px;margin:0}.framed-ui .mini-affinity .meter{width:64px}
+.framed-ui .chat-toolbar{min-height:37px;gap:9px}.framed-ui .chat-toolbar .chat-focus-toggle{display:inline-flex;align-items:center;gap:5px;font-size:13px;margin-right:0;white-space:nowrap}.chat-focus-toggle svg{width:15px;height:15px}
+.framed-ui .room-view-toggle{margin-right:auto}.framed-ui .chat-model-picker{margin-right:auto;margin-left:0}.framed-ui #chat-model-open{max-width:160px}.framed-ui #chat-model-current{max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.framed-ui #history-open{margin-left:auto}.framed-ui .chat-frame .avatar-chat{--avatar-size:70px}.framed-ui .chat-frame .chat-identity h1{font-size:23px}.framed-ui .chat-frame .chat-identity p{font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.framed-ui .composer{border-radius:17px}.framed-ui .token-usage-panel{flex:none}.framed-ui .voice-detail{font-size:11px;min-height:24px}
+/* The rounded composer border already marks focus; avoid a second inner rectangle. */
+body.framed-ui #input:focus-visible{outline:none!important}
+.room-return{display:none;position:fixed;left:calc(var(--frame-left) + 25px);bottom:calc(var(--frame-bottom) + 22px);padding:12px 18px;border:1px solid #ced5df90;border-radius:14px;background:#1f252ded;color:#f4f4f1;align-items:center;gap:10px;z-index:3;font-size:17px}.room-return svg{width:21px;height:21px}.scene-only .room-return{display:flex}
+body.framed-ui.surface-reading{--room-right:12px}.framed-ui.surface-reading .chat-frame,.framed-ui.surface-reading .right-column,.framed-ui.surface-reading .life-expand{display:none!important}
+.framed-ui :is(.journal-dialog,.ellen-profile-dialog){position:fixed;inset:calc(var(--frame-top) + 18px) 28px calc(var(--frame-bottom) + 18px) calc(var(--frame-left) + 18px);width:auto;height:auto;max-width:none;max-height:none;margin:0;z-index:6;background:#20252bf5;border-radius:18px;overflow:auto;font-family:var(--ui)}
+.framed-ui .journal-book{height:clamp(210px,calc(100dvh - var(--frame-top) - var(--frame-bottom) - 412px),740px);min-height:0;max-height:none}.framed-ui .journal-body{min-height:0;overflow:auto}.framed-ui .journal-dialog>header{margin-bottom:12px}
+.framed-ui :is(.journal-dialog,.ellen-profile-dialog)::backdrop{display:none}
+@media(min-height:1050px){.framed-ui .life-art{flex-basis:235px}.framed-ui .life-art>img{max-height:280px}.framed-ui .life-divider{margin:14px 0}.framed-ui .life-clock{padding-top:15px}.framed-ui .life-clock #clock{font-size:42px}}
+@media(max-width:1250px){:root{--frame-left:100px;--frame-life:176px;--frame-top:64px}.framed-ui .brand{flex-basis:119px;width:119px}.framed-ui .brand .ellen-brand-logo{width:119px;height:42px}.frame-page-heading{padding-left:15px;gap:12px}.frame-page-heading>span,.frame-page-heading>svg{display:none}.framed-ui .topbar{gap:10px;padding:0 14px}.framed-ui .avatar-top{--avatar-size:40px}.framed-ui .profile-switch{gap:0}.framed-ui .left-column{padding:20px 7px 12px}.rail-ticket{width:83%}.ticket-paper>span{font-size:23px}}
+@media(max-width:980px){:root{--frame-left:68px;--frame-top:58px;--frame-life:176px;--frame-bottom:14px}.framed-ui .topbar{gap:8px;padding:0 10px}.framed-ui .brand{flex-basis:96px;width:96px}.framed-ui .brand .ellen-brand-logo{width:96px;height:38px}.frame-page-heading{padding-left:12px}.frame-page-heading strong{font-size:18px}.framed-ui .window-controls{width:91px;flex-basis:91px}.framed-ui .top-tools{gap:2px}.framed-ui .left-column{padding:16px 5px 8px}.rail-ticket{width:44px;margin-bottom:15px}.ticket-fin{height:42px;margin-bottom:-8px}.ticket-paper{padding:14px 3px 8px;gap:5px}.ticket-paper>span{font-size:17px}.ticket-paper>img{width:28px;height:28px}.ticket-paper>small{font-size:11px}.ticket-tape{width:26px;height:9px;left:-4px}.ticket-paper>svg{width:17px;height:17px}.framed-ui .chat-frame .chat-header{min-height:66px;padding:0 1px 7px;gap:10px}.framed-ui .chat-frame .avatar-chat{--avatar-size:56px}.framed-ui .chat-frame .chat-identity h1{font-size:21px}.framed-ui .chat-frame .chat-identity p{max-width:185px;font-size:11px}.framed-ui .chat-frame[data-chat-layout]{padding:13px 12px 8px}.framed-ui #chat-model-open{max-width:118px}.framed-ui #chat-model-current{max-width:80px}.framed-ui .chat-toolbar{gap:7px;min-height:31px}.framed-ui .chat-toolbar .chat-focus-toggle{font-size:11px}.framed-ui .room-view-toggle{display:none}.framed-ui .mini-affinity{min-width:30px}.framed-ui .chat-more{margin-left:3px}.framed-ui :is(.journal-dialog,.ellen-profile-dialog){inset:calc(var(--frame-top) + 10px) 12px calc(var(--frame-bottom) + 10px) calc(var(--frame-left) + 10px);padding:14px}.framed-ui .journal-book{overflow:auto}.framed-ui .ellen-profile-dialog[open]{grid-template-columns:1fr 2fr;gap:15px}}
+@media(max-height:760px){.rail-ticket{width:65px;margin-bottom:6px}.ticket-fin{height:42px}.ticket-paper{padding-top:15px;gap:3px}.ticket-paper>span{font-size:19px}.ticket-paper>img{width:30px;height:30px}.framed-ui .right-column{padding-top:12px}.framed-ui .life-art{flex:0 0 165px;min-height:165px}.life-art>img{max-height:165px}.life-art>p{font-size:17px}.life-divider{margin:2px 0;height:22px;min-height:22px}.framed-ui .night-card #clock{font-size:31px}.framed-ui .night-card #today{font-size:14px}.note-paper{min-height:90px;padding-top:17px}.note-paper p{font-size:12px}.sticker-label{font-size:14px}.life-heading .sticker-label{font-size:21px}.framed-ui .voice-detail{min-height:18px}.framed-ui .chat-frame[data-chat-layout]{padding-top:12px}}
+@media(max-height:600px){.rail-ticket{width:43px;margin:20px auto 0}.ticket-fin{height:35px}.ticket-paper>span{font-size:14px}.ticket-paper>img,.ticket-paper>small{display:none}.ticket-paper>svg{width:17px;height:17px}.framed-ui .left-column{overflow-y:auto}.framed-ui .chat-frame .chat-header{min-height:60px}.framed-ui .chat-frame .avatar-chat{--avatar-size:50px}.framed-ui .chat-frame .chat-identity h1{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.framed-ui *{scroll-behavior:auto}}
+/* Replace the old absolute header / horizontal navigation positioning. */
+.framed-ui .journal-book{overflow:visible}
+.framed-ui .life-heading{position:relative;margin-top:12px}
+.life-heading .sticker-label{position:relative;z-index:1}
+.life-fin{position:absolute;left:-5px;top:-26px;width:43px;height:59px;transform:rotate(-15deg);pointer-events:none}
+.framed-ui .journal-page-arrow.previous{left:5px}.framed-ui .journal-page-arrow.next{right:5px}
+.framed-ui .journal-dark{padding-left:42px}.framed-ui .journal-paper{padding-right:42px}
+.framed-ui .topbar :is(.brand,.profile-switch,.top-tools,.window-controls){position:relative;inset:auto;transform:none}
+.framed-ui .night-card .night-moon{top:8px;right:1px;pointer-events:none;width:28px;height:28px}
+.framed-ui .left-column{overflow-x:hidden}
+.framed-ui .top-tools .notification{display:grid}
+@media(max-width:1400px){.frame-page-heading>span,.frame-page-heading>svg{display:none}}
+@media(max-width:980px){.framed-ui .profile-switch{display:flex}.framed-ui .avatar-top{--avatar-size:32px}.framed-ui .top-tools .icon-button{width:28px}.framed-ui .top-tools svg{width:20px}.framed-ui .frame-page-heading{display:none}.framed-ui .window-controls #hide{display:grid}.framed-ui .rail-ticket{max-width:43px}}
+@media(max-height:900px){.framed-ui .right-column{padding-top:12px}.framed-ui .life-heading{margin-bottom:6px}.framed-ui .life-clock{gap:4px;padding-top:4px}.framed-ui .life-clock #clock{font-size:32px}.framed-ui .life-clock #today{font-size:14px}.framed-ui .life-divider{height:20px;min-height:20px;margin:2px 0}.framed-ui .note-paper{min-height:95px;margin-top:11px;padding-top:16px}.framed-ui .life-art{flex-basis:175px;min-height:175px}.framed-ui .life-art>img{max-height:175px}.framed-ui .life-art>p{font-size:17px}}
+/* Keep the approved small-window pages; cap only the expanded desktop view. */
+@media(min-width:1400px){
+ .framed-ui .journal-dialog{width:min(1160px,calc(100vw - var(--frame-left) - 46px));height:min(780px,calc(100dvh - var(--frame-top) - var(--frame-bottom) - 36px));margin:auto;padding:26px 30px}
+ .framed-ui .journal-dialog[open]{display:flex;flex-direction:column}
+ .framed-ui .journal-dialog>:is(.journal-header,.journal-tabs,.journal-status){flex:none}
+ .framed-ui .journal-content{flex:1;min-height:0;display:flex;flex-direction:column}
+ .framed-ui .journal-content:has(.journal-detail){overflow:auto}
+ .framed-ui .journal-book{flex:1;height:auto;min-height:210px;max-height:none}
+ .framed-ui :is(.journal-navigation,.journal-actions){flex:none}
+ .framed-ui .journal-header h2{font-size:30px}
+ .framed-ui .journal-subtitle{font-size:15px}
+ body.framed-ui .journal-tabs .panel-button{font-size:18px}
+ .framed-ui .journal-prose{font-size:21px}
+ .framed-ui .journal-reflection{font-size:19px}
+ .framed-ui .journal-page h3{font-size:27px}
+ .framed-ui .journal-page h4{font-size:22px}
+ .framed-ui :is(.journal-date-heading,.journal-date-link){font-size:16px}
+ body.framed-ui .journal-button{font-size:16px}
+ .framed-ui .ellen-profile-dialog{width:min(1000px,calc(100vw - var(--frame-left) - 46px));height:min(730px,calc(100dvh - var(--frame-top) - var(--frame-bottom) - 36px));margin:auto;padding:24px;gap:24px}
+ .framed-ui .ellen-profile-copy h2{font-size:28px}
+ .framed-ui .ellen-profile-copy h3{font-size:21px;margin:18px 0 10px}
+ .framed-ui .ellen-profile-facts>div{font-size:17px;gap:14px;padding:10px 0}
+ .framed-ui .ellen-profile-description{font-size:21px}
+ .framed-ui .ellen-profile-link{font-size:18px;padding:14px 16px}
+ .framed-ui .ellen-profile-link small{font-size:14px}
+ .framed-ui .ellen-profile-relation{font-size:17px;padding:14px 0;margin-top:12px}
+}

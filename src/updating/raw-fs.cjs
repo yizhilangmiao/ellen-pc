@@ -1,0 +1,1 @@
+"use strict";module.exports=process.versions.electron?require("original-fs"):require("node:fs");

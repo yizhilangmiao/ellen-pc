@@ -1,0 +1,1 @@
+"use strict";const{providerFor:providerFor}=require("./token-usage.cjs");function configuredProviders(r,e){const i=[],o=r?.view();return o?.configured&&o.baseUrl&&i.push(providerFor(o.baseUrl)),["international","china"].some(r=>e?.view("minimax-ellen",r)?.configured)&&i.push("minimax"),i}module.exports={configuredProviders:configuredProviders};

@@ -1,0 +1,1 @@
+"use strict";const{contextBridge:contextBridge,ipcRenderer:ipcRenderer}=require("electron");contextBridge.exposeInMainWorld("ellenLicense",Object.freeze({request:(e,r)=>ipcRenderer.invoke("ellen:license",e,r)}));

@@ -1,0 +1,1 @@
+module.exports=Object.freeze({baseURL:"https://ellen-updates-1410769069.cos.ap-guangzhou.myqcloud.com/updates/win32-x64/stable/",publicKey:"-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA8dp0l2WKS3HmLV7QTUjuBRp1EpmbqahRdnJJ+wPwLlE=\n-----END PUBLIC KEY-----\n"});

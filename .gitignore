@@ -1,0 +1,26 @@
+# 艾莲 · 源码仓库忽略规则
+# 仓库根 = E:\ailian\艾莲电脑端\resources\app（艾莲开发版\resources\app 是指向它的 junction）
+
+# ── 运行时（1.4 GB，可重建，不入库）──
+runtime/
+
+# ── 用户数据 / 记忆库 / 聊天记录（绝不入库）──
+data/
+memory/
+
+# ── 日志与临时 ──
+*.log
+logs/
+_临时/
+
+# ── 备份与打包残留 ──
+*.bak
+*.tmp
+*.old
+*.zip
+*.7z
+
+# ── 系统垃圾 ──
+Thumbs.db
+desktop.ini
+.DS_Store

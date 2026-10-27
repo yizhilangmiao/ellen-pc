@@ -1,0 +1,1 @@
+const{contextBridge:contextBridge,ipcRenderer:ipcRenderer}=require("electron");contextBridge.exposeInMainWorld("desktopAlert",{onShow:e=>ipcRenderer.on("desktop-alert:show",(r,o)=>e(o)),onHide:e=>ipcRenderer.on("desktop-alert:hide",()=>e()),action:e=>ipcRenderer.invoke("desktop-alert:action",e)});

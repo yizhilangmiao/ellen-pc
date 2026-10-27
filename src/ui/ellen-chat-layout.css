@@ -1,0 +1,75 @@
+/* Chat has its own readable scale; surrounding room keeps the approved layout. */
+
+body.ellen-ui .chat-frame[data-chat-layout] {
+  --s: var(--chat-ui-scale, 1.1);
+  position: fixed;
+  right: auto;
+  bottom: auto;
+  margin: 0;
+  min-width: 0;
+  max-width: none;
+  max-height: none;
+  padding: 17px 17px 12px;
+}
+.ellen-ui .chat-frame .chat-header { min-height: 92px; cursor: grab; touch-action: none; user-select: none; }
+.ellen-ui .chat-frame .avatar-chat { --avatar-size: calc(70px * var(--s)); cursor: pointer; }
+.ellen-ui .chat-frame .chat-identity h1 { font-size: calc(21px * var(--s)); }
+.ellen-ui .chat-frame .chat-identity p { font-size: 13px; max-width: 260px; }
+.ellen-ui .chat-drag-handle {
+  width: 112px;
+  height: 23px;
+  padding: 0 0 2px 4px;
+  line-height: 20px;
+  font-size: 11px;
+  letter-spacing: 5px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  z-index: 3;
+  -webkit-app-region: no-drag;
+}
+.ellen-ui .chat-drag-handle:hover { color: var(--theme-white); background: var(--theme-raised); }
+.ellen-ui .chat-drag-handle:focus-visible { outline: 2px solid var(--theme-accent); outline-offset: 3px; }
+.ellen-ui .chat-frame.is-chat-dragging,
+.ellen-ui .chat-frame.is-chat-dragging .chat-header,
+.ellen-ui .chat-frame.is-chat-dragging .chat-drag-handle { cursor: grabbing; }
+.ellen-ui .chat-frame .message {
+  --message-avatar: calc(56px * var(--s));
+  padding-left: calc(69px * var(--s));
+  min-height: var(--message-avatar);
+}
+.ellen-ui .chat-frame .message::before {
+  width: var(--message-avatar);
+  height: var(--message-avatar);
+  background-size: calc(var(--message-avatar) * 24.78125) calc(var(--message-avatar) * 15.5);
+  background-position: calc(var(--message-avatar) * -13.75) calc(var(--message-avatar) * -2.859375);
+}
+.ellen-ui .chat-frame .message.user { padding-left: 20px; padding-right: calc(61px * var(--s)); }
+.ellen-ui .chat-frame .message .user-avatar { width: calc(50px * var(--s)); height: calc(50px * var(--s)); }
+.ellen-ui .chat-frame .message .message-content,
+.ellen-ui .chat-frame .message-translation { font-size: calc(17.5px * var(--s)); line-height: 1.8; }
+.ellen-ui .chat-frame .message-label { font-size: 13px; }
+.ellen-ui .chat-frame .message-time { font-size: 12px; }
+.ellen-ui .chat-frame .composer textarea { font-size: 17px; line-height: 1.6; min-height: 38px; }
+.ellen-ui .chat-frame .chat-toolbar { min-height: 32px; }
+.ellen-ui .chat-frame .chat-toolbar > button,
+.ellen-ui .chat-frame .chat-model-picker #chat-model-open { font-size: 12px; }
+.ellen-ui .chat-frame .voice-detail { font-size: 11px; }
+.ellen-ui .chat-frame > .error { flex-shrink: 0; max-height: 72px; overflow: auto; }
+/* Keep room for the conversation in short windows without shrinking the text. */
+@media (max-height: 700px) {
+  body.ellen-ui .chat-frame[data-chat-layout] { padding: 14px 12px 8px; }
+  .ellen-ui .chat-frame .chat-header { min-height: 64px; padding: 3px 4px 7px; }
+  .ellen-ui .chat-frame .avatar-chat { --avatar-size: 56px; }
+  .ellen-ui .chat-frame .chat-identity h1 { font-size: 21px; margin-bottom: 3px; }
+  .ellen-ui .chat-frame .chat-identity p { font-size: 12px; }
+  .ellen-ui .chat-frame .chat-toolbar { min-height: 27px; }
+  .ellen-ui .chat-frame .composer { padding: 6px 10px; }
+  .ellen-ui .chat-frame .composer textarea { min-height: 30px; }
+  .ellen-ui .chat-frame .realtime-controls { padding: 4px 3px 0; }
+  .ellen-ui .chat-frame .realtime-controls button { padding: 4px 10px; }
+  .ellen-ui .chat-frame .voice-detail { min-height: 18px; padding-top: 2px; }
+}
+@media (max-width: 740px) {
+  .ellen-ui .chat-frame .chat-identity p { max-width: 190px; }
+}
