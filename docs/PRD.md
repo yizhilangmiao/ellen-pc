@@ -192,6 +192,22 @@ E:\ailian\
 | 性能与用量 | `voice-latency.cjs` / `speech-usage.cjs` / `speech-performance.cjs` | 延迟监控、计费统计 |
 | 失败引导 | `ui/voice-failure-guidance.js` | 语音失败时告诉用户怎么办 |
 
+**发声有两条完全独立的链路，用户在「设置 → 声音」里选一条**：
+
+| | 本地语音（GPT-SoVITS） | 云端语音（MiniMax） |
+|---|---|---|
+| 实现 | `local-speech.cjs` 用 `spawn` 起 Python 子进程，收 `pcm_s16le` 流（`audio-chunk` 事件） | `minimax-speech.cjs` HTTP 调 MiniMax，模型 `speech-2.8-hd` / `speech-2.8-turbo` |
+| 算在哪 | 本机显卡/CPU | MiniMax 服务器（要说的文字会发出去） |
+| 花钱 | 不花，只耗电 | 按用量计费（余额/额度/限流各有独立报错文案） |
+| 音色 | 本机模型文件 | 平台音色，或自己克隆的（`minimax-clone.cjs` + `/v1/get_voice`） |
+| 站点 | 无 | 分 `china` / `international`，各填各的密钥 |
+| 情绪 | 无 | 7 种：happy / angry / relaxed / serious / jealous / tsundere / displeased |
+| 失败表现 | "所选声音加载失败，请查看本地模型和运行环境" | "账户余额不足" / "额度已用完" / "请求过于频繁" 逐条对应 |
+
+**已知硬编码风险**：`local-speech.cjs` 的 `localVoicePaths()` 把 Python 解释器写死为
+`D:/AI-Local/新想法/GPT-SoVITS-v2ProPlus-20260921/.venv/Scripts/python.exe`。
+该目录一旦改名/迁移/删掉，本地语音直接不可用（报"运行环境"）。见 11.2 待确认。
+
 ### 5.5 主动性
 
 | 模块 | 文件 | 用途 |
@@ -227,6 +243,8 @@ E:\ailian\
 | 请求经济 | `request-economy.cjs` | 请求节流/合并 |
 | 费用面板 | `ui/api-cost.js` | 展示花了多少钱 |
 
+**模型来源完全开放，不锁厂商**：供应商设置里填任意 OpenAI 兼容的 `base-url` + `api-key`（要求 HTTPS 或本机 localhost）；`ModelCatalog` 会调 `/v1/models` 拉列表，拉不到时（无列表权限 / 限流 / 填成官网页面）允许**手动填写模型 ID**。默认预填 DeepSeek 只是省事，不是限制。
+
 ### 5.8 外观与体验
 
 `appearance-store.cjs` / `appearance-actions.cjs` / `ui/appearance.js`：背景图、主题、动效开关、界面音效、背景音乐。角色切换时外观按 `role` 隔离（"当前角色已切换，请重新打开外观面板"）。
@@ -235,7 +253,10 @@ E:\ailian\
 
 ### 5.9 授权与 DLC
 
-见第七节。
+**授权**：离线机器码 + Ed25519 签名。文件 `license.ellen` + `clock.bin`，代码在 `src/licensing/`（含 `format.cjs` / `store.cjs` / `keys.cjs` / `activation` 页）。状态机：`perpetual` / `trial` / `EXPIRED` / `MISSING` / `DOWNGRADE` / `STORAGE` / `CLOCK`，每种都有面向用户的中文文案（如"试玩已结束。购买后输入永久激活码即可继续使用原来的聊天和记忆。"）。安卓端另有一套（`ELLENA1` 前缀 / `android-v1` / Ed25519 + 机器码 `ELA1-` / AndroidKeyStore），流程文档在 `E:\ailian\_临时\EllenLicense-激活校验流程.md`。
+
+**DLC**：已实现但不启用。17 个 `dlc-*` 文件全在 `src/licensing/`，内容源是腾讯云 COS：`https://ellen-updates-1410769069.cos.ap-guangzhou.myqcloud.com/dlc/`（`dlc-config.cjs` 全文只有这一行 baseURL），独立窗口 `dlc.html` 不在主界面。
+**YG 2026-10-27 决定：不做 DLC。** 后续应下线入口，代码可暂留。
 
 ### 5.10 系统保障
 
@@ -304,7 +325,10 @@ Python 运行时固定路径（`runtime-paths.cjs`）：`runtime\python\python.e
 ### 7.3 备份与恢复
 
 - **聊天导出/导入**：`chat-io.cjs`（0.2.5 新增）
-- **自动清理**：会话上限 10 个（"自动清理仅支持保留 10 个聊天"）`[待确认]` 是否可调
+- **自动清理**：**目标是不设上限**（YG 2026-10-27 定）。当前实现是硬编码 10：
+  `chat-service.cjs` 的 `connect()` 里 `this.historyAutoCleanup ? this.store.trimHistory(10, t).length : 0`；
+  `chat-store.trimHistory(e,s)` 只在 `e===10` 时放行，否则抛"自动清理仅支持保留10个聊天。"。
+  **属待改代码**，改动时把 `tests/chat-store.test.cjs` 里"自动清理只接受保留 10 个聊天"那条用例一并改掉。
 - **无云同步**：设计如此。备份 = 手工复制 `data/` 目录
 
 ---
@@ -313,10 +337,10 @@ Python 运行时固定路径（`runtime-paths.cjs`）：`runtime\python\python.e
 
 1. 用户注册 / 登录 / 多用户 / 权限体系
 2. 云同步、云数据库、多设备漫游
-3. 手机端与 PC 端数据互通（安卓版是独立产品线）
+3. ~~手机端与 PC 端数据互通~~ → **长期要做**（YG 2026-10-27 定）。现状两端完全独立：PC 用 `ELLEN1` / `desktop-v1` / sqlite，安卓用 `ELLENA1` / `android-v1` / AndroidKeyStore，数据结构也不同。属独立立项，不在当前版本。
 4. 公网部署、任何形式的外部访问入口
 5. 与社交平台（微信/抖音/B站）的数据对接
-6. 在线内容商城（DLC 走离线分发）
+6. ~~在线内容商城~~ → **不做 DLC**（YG 2026-10-27 定）
 
 ---
 
@@ -368,11 +392,20 @@ Python 运行时固定路径（`runtime-paths.cjs`）：`runtime\python\python.e
 
 ---
 
-## 十一、待确认清单（只有 YG 能定）
+## 十一、决策记录与待确认
 
-1. **会话上限 10 个**是硬限制还是可配置？用户丢了老聊天算不算事故？
-2. **DLC 内容**具体是什么（剧情包？角色包？语音包？）——代码里有 13 个 dlc-* 模块但看不出内容形态。
-3. **云端语音供应商**是否只有 MiniMax？`minimax-*` 是唯一实现吗？
-4. **剧情模式**（`story/`）是独立产品线还是主产品的附属玩法？它的角色卡"博主"是模板还是正式内容？
-5. **安卓端**（`艾莲手机端/艾莲-0.1.8`）与 PC 端是否要有数据互通的长期规划？
-6. 模型目录里 `deepseek-flash` / `deepseek-v4-pro` 是仅内置推荐，还是限制了可选范围？
+### 11.1 已定（YG 2026-10-27）
+
+| # | 事项 | 决定 | 性质 |
+|---|---|---|---|
+| 1 | 会话数量 | **不设上限** | 待改代码（当前硬编码 10，见 7.3） |
+| 2 | DLC | **不做** | 待下线入口（17 个文件已在 `src/licensing/`） |
+| 3 | 安卓 / PC 互通 | **要做** | 独立立项，不在当前版本 |
+| 4 | 模型目录 | **可自定义** | 已支持，无需改代码（见 5.7） |
+| 5 | 云端语音 | 只有 MiniMax 一家；本地另有 GPT-SoVITS 一条独立链路 | 见 5.4 |
+
+### 11.2 待确认
+
+1. **剧情模式**（`story/`）是独立产品线还是主产品的附属玩法？它的角色卡"博主"是模板还是正式内容？
+2. **本地语音的 Python 解释器路径**写死在 `D:/AI-Local/新想法/GPT-SoVITS-v2ProPlus-20260921/.venv/Scripts/python.exe`，那个目录还在吗？要不要改成可配置？
+3. **试玩与正式不同 profile**（实测 `trial-v3-20260930-95a1edae`）：从试玩转永久激活后，原聊天记录与记忆是否要自动继承？
