@@ -328,6 +328,7 @@ Python 运行时固定路径（`runtime-paths.cjs`）：`runtime\python\python.e
 
 | # | 验收项 | 判定方法 |
 |---|---|---|
+| A0 | **冒烟测试全绿** | `pwsh -File .agents\test.ps1` 输出 `[PASS] 全部通过`（当前 30 项） |
 | A1 | 启动无异常 | 双击 `ellen.exe` 到主界面出现，`data/logs/startup.jsonl` 无 error |
 | A2 | 聊天主链路通 | 发一句话 → 收到流式回复 → 重启应用后该条仍在 |
 | A3 | 未激活态正确 | 删掉 `license.ellen` → 应进激活页而不是崩 |
@@ -358,7 +359,7 @@ Python 运行时固定路径（`runtime-paths.cjs`）：`runtime\python\python.e
 
 | # | 缺口 | 影响 | 状态 |
 |---|---|---|---|
-| 1 | 无自动化测试 | 改一处不知坏几处，全靠人肉点 | 本轮补最小冒烟 |
+| 1 | 无自动化测试 | 改一处不知坏几处，全靠人肉点 | **已解决**：`tests/` 30 项冒烟（授权格式/聊天库/角色卡解析），`pwsh -File .agents\test.ps1` |
 | 2 | 无版本存档历史 | 改坏回不去 | **已解决**：git 基线 `5806c67` |
 | 3 | 发行包滞后于源码 | 发给用户的包缺功能 | 待重新打包 |
 | 4 | 主进程代码被压缩成单行 | 无法 review、diff 噪音大 | 本轮不动，记录在案 |
