@@ -45,3 +45,16 @@ CREATE TABLE IF NOT EXISTS memory_notebook (
   reflection TEXT NOT NULL CHECK(length(trim(reflection)) > 0),
   source_event_id TEXT NOT NULL REFERENCES source_events(id)
 ) STRICT;
+
+-- Rolling per-conversation digest. Deterministic text built from stored
+-- events and memories; it never invents facts and is safe to recompute.
+CREATE TABLE IF NOT EXISTS conversation_summaries (
+  conversation_id TEXT PRIMARY KEY,
+  summary TEXT NOT NULL CHECK(length(trim(summary)) > 0),
+  covered_events INTEGER NOT NULL CHECK(covered_events >= 1),
+  covered_until TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL DEFAULT 1
+) STRICT;
+CREATE INDEX IF NOT EXISTS source_events_conversation ON source_events(conversation_id,occurred_at);
