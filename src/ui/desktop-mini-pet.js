@@ -1,0 +1,425 @@
+!function(){"use strict";
+/* 艾莲桌宠行为层 v2：呼吸 / 溜达 / 小动作 / 边缘趴趴 / 犯困 / 被戳反应 / 台词 */
+try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return}catch(_){}
+const $=id=>document.getElementById(id);
+const mascot=$("mascot");if(!mascot)return;
+const img=mascot.querySelector("img");if(!img)return;
+if(document.body.classList.contains("reduce-ui-motion"))return;
+const shell=$("mini-shell"),thought=$("thought");
+const root=document.documentElement;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ---- 窗口跟随式移动：她走到哪，小人窗口就跟到哪 ----
+   窗口恒为 440×510 的小窗（铺满全屏会让鼠标事件转发失效、整块桌面被吃掉），
+   由主进程按帧平移窗口，她在窗口内的相对位置不变，屏幕上就是她在走。 ---- */
+let dx=0,dy=0,glideRaf=0;
+let wa={x:0,y:0,width:0,height:0};
+let pos={x:0,y:0};
+let moveTimer=0,moveSeq=0,patrol={x:0,y:0,t:0};
+function apply(){root.style.setProperty("--pet-dx",dx.toFixed(1)+"px");root.style.setProperty("--pet-dy",dy.toFixed(1)+"px")}
+function cancelGlide(){if(glideRaf){cancelAnimationFrame(glideRaf);glideRaf=0}}
+function invoke(a){try{return window.desktopMini.invoke(a)}catch(_){return Promise.reject(_)}}
+function readPos(){const r=mascot.getBoundingClientRect();
+ return{x:Math.round(window.screenX+r.left),y:Math.round(window.screenY+r.top),w:Math.round(r.width||mascot.offsetWidth||168)}}
+function size(){return mascot.offsetWidth||168}
+function playBounds(){const b=wa.width?{x:wa.x,y:wa.y,w:wa.width,h:wa.height}
+ :{x:0,y:0,w:Math.max(0,(screen.width||innerWidth)-size()),h:Math.max(0,(screen.height||innerHeight)-size())};
+ return{minX:b.x,maxX:b.x+b.w-size(),minY:b.y,maxY:b.y+b.h-size()}}
+function stopWalk(){clearTimeout(moveTimer);moveTimer=0;moveSeq++;walking=false;img.classList.remove("walking");
+ try{invoke({type:"walk-stop"})}catch(_){}}
+function moveTo(tx,ty,ms,done){
+ if(held||asleep)return;
+ const cur=readPos(),lim=playBounds();
+ tx=clamp(Math.round(tx),lim.minX,Math.max(lim.minX,lim.maxX));
+ ty=clamp(Math.round(ty),lim.minY,Math.max(lim.minY,lim.maxY));
+ const dist=Math.hypot(tx-cur.x,ty-cur.y);
+ // 原地不用动：别打断正在进行的那一段行走，也别把 walking 状态卡住
+ if(dist<14){if(!walking)done&&done();return}
+ clearTimeout(moveTimer);
+ ms=ms||Math.round(300+dist*2.15);
+ // 朝向：横向位移太小就不转身，免得原地小幅挪动时整个人镜像翻来翻去
+ if(Math.abs(tx-cur.x)>18)img.classList.toggle("flip",tx<cur.x);
+ // 摇摆幅度跟着步幅走：小步轻晃，远行才明显摆起来
+ const amp=dist>240?4.2:dist>120?3.2:2.2;
+ img.style.setProperty("--waddle-amp",amp.toFixed(1)+"deg");
+ img.style.setProperty("--waddle-ms",dist>200?".5s":".62s");
+ walking=true;img.classList.add("walking");
+ pos.x=tx;pos.y=ty;patrol={x:cur.x,y:cur.y,t:Date.now()};
+ const seq=++moveSeq;
+ try{invoke({type:"walk-to",x:tx,y:ty,ms})}catch(_){}
+ moveTimer=setTimeout(()=>{if(seq!==moveSeq)return;moveTimer=0;walking=false;img.classList.remove("walking");done&&done()},ms+60);
+}
+
+/* ---- 状态 ---- */
+let held=false,asleep=false,walking=false,pose="",idleTimer=0,lastActive=Date.now();
+
+/* ---- 姿态层：站姿立绘 ↔ 趴着 / 趴着睡觉 / 抱住左右边缘（图层交叉淡入淡出） ---- */
+function setPose(name){
+ mascot.classList.toggle("pose-loaf","loaf"===name);
+ mascot.classList.toggle("pose-sleep","sleep"===name);
+ mascot.classList.toggle("pose-hug-left","hug-left"===name);
+ mascot.classList.toggle("pose-hug-right","hug-right"===name);
+}
+function edgePose(){return"bottom"===pose?"loaf":"left"===pose?"hug-left":"right"===pose?"hug-right":""}
+function poseImg(){return"bottom"===pose?mascot.querySelector(".pet-pose-loaf"):"left"===pose?mascot.querySelector(".hug-left"):"right"===pose?mascot.querySelector(".hug-right"):null}
+/* 趴下去：塌一下身子，同时淡入趴姿 */
+function lieDown(lie){
+ setPose(lie);
+ oneShot(mascot,"pet-flop",540);
+}
+
+/* ---- 一次性动画 ---- */
+function oneShot(el,cls,ms){el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);
+ setTimeout(()=>el.classList.remove(cls),ms)}
+
+/* ---- 粒子（爱心 / 星星 / 音符 / 问号）---- */
+function fx(ch,n){for(let i=0;i<n;i++){const s=document.createElement("span");
+ s.className="pet-fx";s.textContent=ch;
+ s.style.left=(46+Math.random()*24)+"%";s.style.top=(8+Math.random()*14)+"%";
+ s.style.setProperty("--fx-x",((Math.random()*2-1)*34).toFixed(0)+"px");
+ s.style.animationDelay=(i*90)+"ms";
+ mascot.appendChild(s);setTimeout(()=>s.remove(),1500)}}
+
+/* ---- 思考气泡台词（借用原有 #thought，按姿态选择锚定方向）---- */
+let lineTimer=0;
+function showThought(text,mode){
+ if(!thought)return;
+ const t=thought.querySelector("#thought-text")||thought.firstElementChild;
+ if(t)t.textContent=text;
+ thought.classList.remove("thought-top","thought-left","thought-right","below");
+ if("top"===mode)thought.classList.add("thought-top","below");
+ else if("left"===mode)thought.classList.add("thought-left");
+ else if("right"===mode)thought.classList.add("thought-right");
+ thought.hidden=false;
+ try{thought.animate([{opacity:0,transform:"translateY(8px) scale(.9)"},{opacity:1,transform:"translateY(0) scale(1)"}],{duration:210,easing:"ease-out"})}catch(_){}
+ clearTimeout(lineTimer);
+ lineTimer=setTimeout(()=>{thought.hidden=true;thought.classList.remove("thought-top","thought-left","thought-right","below")},3800);
+}
+
+/* ---- 台词池（贴她的语气）---- */
+const LINES={
+ stretch:["伸——个——懒腰。","嗯啊……保持一个姿势太久了。","舒展完毕，状态回满。"],
+ spin:["转圈圈～","头晕了，但是值得。","看我的尾鳍平衡术。"],
+ look:["嗯？谁在叫我。","总感觉有人在看我。","那边……好像有动静。","侦查一圈，一切正常。"],
+ hum:["♪～♪～","哼歌被听到了？那是在排练。","有首歌，一直卡在一个地方。"],
+ hop:["关节都活动开了。","今天状态不错嘛。","要不要一起动一动？"],
+ yawn:["哈啊……眼皮在打架。","困意来敲门了。","再不发呆一会儿，我要睡着了。"],
+ ambient:["保持可爱，是我的本职工作。","在想你什么时候来戳我。","晚饭吃什么，这是个哲学问题。","屏幕是暖的，比水族箱好。","……不发呆的话，算不上专业的桌宠。"],
+ hover:["再摸要充电了。","嗯……就允许你摸这一下。","手好暖。","（蹭）"],
+ clingBottom:["趴在这儿刚刚好。","地板凉丝丝的，舒服。","这里是我的专属地垫了。","趴着也是一种工作姿势。"],
+ clingLeft:["靠着这边，谁也挤不到我。","这个角度看房间，还挺新鲜。","左舷停靠完毕。"],
+ clingRight:["右边视野不错嘛。","右舷停靠完毕。","贴着边儿，安全感满分。"],
+ clingTop:["倒挂是鲨鱼祖传技能。","血往头上涌……还挺刺激。","从这里掉下去，你要接住我。"],
+ clingPoke:["别摇，会掉下去的。","挂着呢，手下留情。"],
+ sleepy:["……撑不住了。","先趴五分钟……就五分钟。","眼皮好重，先睡了。","地板比床好睡，别问我为什么。"],
+ tired:["走够了，先歇一下。","腿有点酸……趴会儿。","巡完这一圈就休息。","找个地方躺平。"],
+ restDone:["睡饱了，继续逛。","嗯？我睡了多久……","充好电，接着溜达。","尾巴睡麻了，先活动活动。"],
+ leaveEdge:["歇够了，回去站岗。","趴太久，尾巴有点麻。","休息结束，继续营业。"]
+};
+
+/* ---- 睡觉 Zzz ---- */
+const zzz=document.createElement("div");zzz.id="pet-zzz";
+zzz.innerHTML="<span>Ｚ</span><span>ｚ</span><span>ｚ</span>";shell.appendChild(zzz);
+
+/* ---- 面板检测：聊天/通话/设置开着时，她要回家站好 ---- */
+function panelOpen(){return["chat","call","options","error"].some(id=>{const el=$(id);return el&&!el.hidden})}
+
+/* ---- 边缘趴趴：松手时按「她自己的位置 + 多拖出去的距离」判定 ---- */
+function screenBox(){
+ if(wa.width&&wa.height){
+  return{left:wa.x,top:wa.y,right:wa.x+wa.width,bottom:wa.y+wa.height,
+   waLeft:wa.x,waTop:wa.y,waRight:wa.x+wa.width,waBottom:wa.y+wa.height};
+ }
+ const sw=screen.width||innerWidth,sh=screen.height||innerHeight;
+ let ax=typeof screen.availLeft==="number"?screen.availLeft:0;
+ let ay=typeof screen.availTop==="number"?screen.availTop:0;
+ let aw=screen.availWidth,ah=screen.availHeight;
+ if(!(aw>sw*.6))aw=sw;
+ if(!(ah>sh*.6))ah=sh;
+ return{left:ax,top:ay,right:ax+sw,bottom:ay+sh,waLeft:ax,waTop:ay,waRight:ax+aw,waBottom:ay+ah};
+}
+/* 拖动起点：窗口位置 + 光标位置（用于计算「顶住后再多拖了几像素」） */
+let drag0=null,lastPtr=null;
+document.addEventListener("pointermove",e=>{lastPtr={x:e.screenX,y:e.screenY}},true);
+document.addEventListener("pointerup",e=>{lastPtr={x:e.screenX,y:e.screenY}},true);
+/* 小人在屏幕上的实际位置（窗口铺满工作区后，窗口坐标恒为 0，必须以她本人为准） */
+function mascotBox(){const r=mascot.getBoundingClientRect();return{l:window.screenX+r.left,t:window.screenY+r.top,s:r.width}}
+function edgeAtEnd(){
+ const b=screenBox();
+ if(!lastPtr)return"";
+ const m=mascotBox();
+ // 底边：她的脚真的抵到工作区底（避开任务栏）
+ if(m.t+m.s>=b.waBottom-3)return"bottom";
+ // 左右：必须真的被钳住，且光标再多推出去几像素（说明是想推到墙里）
+ if(drag0){
+  const desX=drag0.mx+(lastPtr.x-drag0.px);
+  if(m.l<=b.waLeft+2&&desX<=m.l-5)return"left";
+  if(m.l+m.s>=b.waRight-2&&desX>=m.l+5)return"right";
+ }
+ return"";
+}
+function clearPose(){
+ img.classList.remove("cling-bottom","cling-left","cling-right","cling-top");
+ thought&&thought.classList.remove("thought-top","thought-left","thought-right");
+ pose="";setPose(asleep?"sleep":"");
+}
+function enterCling(edge){
+ clearPose();cancelGlide();
+ pose=edge;
+ img.classList.add("cling-"+edge);
+ setPose(edgePose());
+ const b=screenBox();
+ const r=readPos(),sz=r.w;
+ let tx=r.x,ty=r.y;
+ if("bottom"===edge)ty=Math.round(b.waBottom-2-sz);
+ else if("left"===edge)tx=Math.round(b.waLeft+2);
+ else if("right"===edge)tx=Math.round(b.waRight-2-sz);
+ moveTo(tx,ty,420,()=>{if("bottom"===pose)oneShot(mascot,"pet-flop",520)});
+ placeZzz();
+ const pool=LINES["cling"+edge.charAt(0).toUpperCase()+edge.slice(1)];
+ if(pool&&Math.random()<.9)showThought(pick(pool),"top"===edge?"top":"left"===edge?"left":"");
+ clearTimeout(leaveTimer);
+ leaveTimer=setTimeout(leaveEdge,90000+Math.random()*90000);
+}
+
+/* ---- 趴久了会自己走回来 ---- */
+let leaveTimer=0;
+function leaveEdge(){
+ if(held||asleep||panelOpen()||!pose)return;
+ clearPose();cancelGlide();
+ oneShot(img,"pet-land",600);
+ setTimeout(()=>{if(!held&&!pose&&Math.random()<.7)showThought(pick(LINES.leaveEdge))},600);
+ scheduleIdle();
+}
+
+/* ---- Zzz 跟随姿态定位 ---- */
+function placeZzz(){
+ if(!zzz||!mascot)return;
+ const r=mascot.getBoundingClientRect();
+ let x=r.left+r.width*.6,y=r.top+r.height*.04;
+ if("top"===pose){x=r.left+r.width*.6;y=r.bottom-r.height*.22}
+ else if("left"===pose){x=r.left+r.width*.66;y=r.top+r.height*.3}
+ else if("right"===pose){x=r.left+r.width*.3;y=r.top+r.height*.3}
+ else if(asleep){x=r.left+r.width*.72;y=r.top+r.height*.03}
+ zzz.style.left=Math.round(x)+"px";zzz.style.top=Math.round(y)+"px";
+}
+
+/* ---- 被戳 / 双击反应（情绪阶段由 poke-lines 的 stage 决定）---- */
+let lastPoke=0;
+mascot.addEventListener("pointerup",e=>{
+ if(e.button!==0||mascot.classList.contains("dragging"))return;
+ bump();
+ const now=Date.now(),dbl=now-lastPoke<420;lastPoke=now;
+ if(asleep){wake(true);fx("✦",4);return}
+ if(walking)stopWalk();
+ let stage="";try{stage=thought&&thought.dataset&&thought.dataset.stage||""}catch(_){}
+ const map={pleased:"pet-hop",coy:"pet-shy",helpless:"pet-grumpy",resigned:"pet-dizzy"};
+ const cls=map[stage]||"pet-hop";
+ const lieImg=poseImg();
+ if(lieImg){oneShot(lieImg,"pet-nudge",560);fx("♥",1)}
+ else{oneShot(img,cls,1500);if("pet-hop"===cls)fx("♥",3)}
+ if(dbl)fx("✦",5);
+ if(pose&&Math.random()<.4)showThought(pick(LINES.clingPoke),pose==="top"?"top":pose==="left"?"left":"");
+});
+
+/* ---- 悬停：身体朝光标倾；摸一会儿会蹭你 ---- */
+let hoverTimer=0;
+mascot.addEventListener("pointerenter",()=>{bump();if(asleep)wake(false);
+ clearTimeout(hoverTimer);
+ hoverTimer=setTimeout(()=>{if(!held&&!panelOpen()&&mascot.matches(":hover")){
+  fx("♥",1);if(Math.random()<.55)showThought(pick(LINES.hover))}},1500)});
+mascot.addEventListener("pointerleave",()=>{clearTimeout(hoverTimer);
+ if(!pose&&!mascot.classList.contains("pet-looking"))root.style.setProperty("--pet-lean","0deg")});
+mascot.addEventListener("pointermove",e=>{bump();if(pose||mascot.classList.contains("pet-looking"))return;
+ const r=mascot.getBoundingClientRect();
+ const rel=(e.clientX-(r.left+r.width/2))/(r.width/2||1);
+ // 光标正好压在她中线附近时不跟着抖，避免手抖带出细碎的左右晃
+ root.style.setProperty("--pet-lean",(Math.abs(rel)<.14?0:clamp(rel*5,-6,6)).toFixed(1)+"deg")});
+
+/* ---- 被拎起来：取消姿态、归位、晃悠；放下：贴边判定 or 落地弹 ---- */
+new MutationObserver(()=>{
+ const d=mascot.classList.contains("dragging");
+ if(d&&!held){held=true;cancelGlide();walking=false;img.classList.remove("walking");
+  stopWalk();
+  const mb=mascotBox();drag0={mx:mb.l,my:mb.t,px:lastPtr?lastPtr.x:null,py:lastPtr?lastPtr.y:null};
+  clearPose();img.classList.add("held");if(asleep)wake(false);
+  lookSeq++;mascot.classList.remove("pet-looking");root.style.setProperty("--pet-lean","0deg")}
+ if(!d&&held){held=false;img.classList.remove("held");
+  setTimeout(()=>{if(held||panelOpen())return;
+   const edge=edgeAtEnd();
+   drag0=null;
+   if(edge)enterCling(edge);
+   else{const p=readPos();pos.x=p.x;pos.y=p.y;clearPose();oneShot(img,"pet-land",600);scheduleIdle()}
+  },150);
+  lastActive=Date.now()}
+}).observe(mascot,{attributes:true,attributeFilter:["class"]});
+
+/* ---- 溜达：整块桌面随便走，走几段就累了 ---- */
+let fatigue=0,restAt=4+Math.floor(Math.random()*3),walkChain=0,restTimer=0;
+function wander(depth){
+ if(held||asleep||walking||pose||panelOpen())return;
+ if(fatigue>=restAt)return rest();
+ const lim=playBounds();
+ if(lim.maxX-lim.minX<80||lim.maxY-lim.minY<80)return;
+ const cur=readPos();
+ const far=160+Math.random()*430,ang=Math.random()*Math.PI*2;
+ let tx=clamp(Math.round(cur.x+Math.cos(ang)*far),lim.minX+14,lim.maxX-14);
+ let ty=clamp(Math.round(cur.y+Math.sin(ang)*far*.66),lim.minY+14,lim.maxY-14);
+ if(Math.hypot(tx-cur.x,ty-cur.y)<90){
+  tx=clamp(Math.round(cur.x+(Math.random()<.5?-1:1)*(150+Math.random()*300)),lim.minX+14,lim.maxX-14);
+  ty=clamp(Math.round(cur.y+(Math.random()*2-1)*110),lim.minY+14,lim.maxY-14);
+  if(Math.hypot(tx-cur.x,ty-cur.y)<70)return;
+ }
+ const step=Math.hypot(tx-cur.x,ty-cur.y);
+ moveTo(tx,ty,Math.round(360+step*2.15),()=>{
+  fatigue+=1;
+  if(held||asleep||pose||panelOpen()){walkChain=0;return}
+  if(fatigue>=restAt)return rest();
+  if((depth|0)<3&&Math.random()<.45){
+   setTimeout(()=>{if(!held&&!asleep&&!pose&&!panelOpen())wander((depth|0)+1)},320+Math.random()*420);
+  }else walkChain=0;
+ });
+}
+
+/* ---- 走累了：当场趴下闭眼歇一会儿，睡饱了自己爬起来继续逛 ---- */
+function rest(){
+ if(held||asleep||pose||panelOpen())return;
+ fatigue=0;restAt=4+Math.floor(Math.random()*3);walkChain=0;
+ if(Math.random()<.55)showThought(pick(LINES.tired));
+ setTimeout(()=>{
+  if(held||asleep||pose||panelOpen())return;
+  asleep=true;lieDown("sleep");placeZzz();zzz.classList.add("show");
+  if(Math.random()<.5)showThought(pick(LINES.sleepy));
+  clearTimeout(restTimer);
+  restTimer=setTimeout(()=>{
+   if(held||!asleep)return;
+   wake(false);
+   if(Math.random()<.55)showThought(pick(LINES.restDone));
+   scheduleIdle();
+  },42000+Math.random()*76000);
+ },280);
+}
+
+/* ---- 小动作 ---- */
+let lookSeq=0;
+function look(){
+ const seq=++lookSeq;
+ mascot.classList.add("pet-looking");
+ setTimeout(()=>{if(seq!==lookSeq)return;root.style.setProperty("--pet-lean","-3.6deg")},0);
+ setTimeout(()=>{if(seq!==lookSeq)return;root.style.setProperty("--pet-lean","3.2deg")},800);
+ setTimeout(()=>{if(seq!==lookSeq)return;root.style.setProperty("--pet-lean","0deg")},1600);
+ setTimeout(()=>{if(seq!==lookSeq)return;mascot.classList.remove("pet-looking")},2600);
+ if(Math.random()<.65)fx("?",1);
+}
+function act(kind){
+ if(Math.random()<.45)showThought(pick(LINES[kind]));
+ switch(kind){
+  case"stretch":oneShot(img,"pet-stretch",950);break;
+  case"spin":oneShot(img,"pet-spin",950);break;
+  case"look":look();break;
+  case"hum":fx("♪",2);break;
+  case"hop":oneShot(img,"pet-hop",600);break;
+  case"yawn":oneShot(img,"pet-stretch",950);fx("♪",1);break;
+ }
+}
+
+/* ---- 空闲调度：溜达 / 小动作 / 发呆台词 ---- */
+function scheduleIdle(){clearTimeout(idleTimer);idleTimer=setTimeout(idleTick,7000+Math.random()*11000)}
+function idleTick(){
+ if(held||asleep||walking||panelOpen())return scheduleIdle();
+ if(pose){if(Math.random()<.22)fx("♪",2);else if(Math.random()<.08)showThought(pick(LINES.ambient));return scheduleIdle()}
+ const r=Math.random();
+ if(r<.5)wander(0);
+ else if(r<.58)act("stretch");
+ else if(r<.66)act("spin");
+ else if(r<.74)act("look");
+ else if(r<.81)act("hum");
+ else if(r<.88)act("hop");
+ else if(r<.94)act("yawn");
+ else showThought(pick(LINES.ambient));
+ scheduleIdle();
+}
+
+/* ---- 行走看门狗：万一某次行走的收尾没跑到，窗口 1.6 秒没动就把 walking 收掉，
+   免得她挂着走路状态在原地一直左右摇 ---- */
+setInterval(()=>{
+ if(!walking){patrol.t=0;return}
+ const p=readPos();
+ if(!patrol.t){patrol={x:p.x,y:p.y,t:Date.now()};return}
+ if(Math.abs(p.x-patrol.x)>1||Math.abs(p.y-patrol.y)>1){patrol={x:p.x,y:p.y,t:Date.now()};return}
+ if(Date.now()-patrol.t>1600)stopWalk();
+},500);
+
+/* ---- 面板打开 → 清姿态走回家 ---- */
+const panelObserver=new MutationObserver(()=>{if(panelOpen()&&!held){if(walking)stopWalk();clearPose();cancelGlide()}});
+["chat","call","options"].forEach(id=>{const el=$(id);el&&panelObserver.observe(el,{attributes:true,attributeFilter:["hidden"]})});
+
+/* ---- 眨眼：站姿上叠一层闭眼立绘，随机闪一下（偶尔连眨） ---- */
+const blinkImg=mascot.querySelector("img.pet-blink");
+let blinkTimer=0,blinkHoldT=0;
+const BUSY=/\b(pet-hop|pet-shy|pet-grumpy|pet-dizzy|pet-startle|pet-land|pet-stretch|pet-spin|pet-nudge|pet-flop|doze|walking|held)\b/;
+function canBlink(){
+ if(held||asleep||walking||pose||panelOpen())return false;
+ return !BUSY.test(img.className||"");
+}
+function doBlink(times){
+ if(!blinkImg||!canBlink())return;
+ blinkImg.classList.add("on");
+ clearTimeout(blinkHoldT);
+ blinkHoldT=setTimeout(()=>{
+  blinkImg.classList.remove("on");
+  if(times>1)setTimeout(()=>doBlink(times-1),120+Math.random()*90);
+ },65+Math.random()*45);
+}
+function scheduleBlink(){
+ clearTimeout(blinkTimer);
+ blinkTimer=setTimeout(()=>{
+  doBlink(Math.random()<.22?2:1);
+  scheduleBlink();
+ },2300+Math.random()*5200);
+}
+scheduleBlink();
+
+/* ---- 活跃度 / 睡觉（无聊了就趴下睡）---- */
+function bump(){lastActive=Date.now();if(asleep)wake(false)}
+function wake(startle){clearTimeout(restTimer);asleep=false;img.classList.remove("doze");zzz.classList.remove("show");blinkImg&&blinkImg.classList.remove("on");setPose(edgePose());
+ if(startle)oneShot(img,"pet-startle",500)}
+document.addEventListener("pointerdown",bump,true);
+document.addEventListener("keydown",bump,true);
+setInterval(()=>{
+ if(held||asleep||walking||panelOpen())return;
+ if(Date.now()-lastActive>1e5){
+  asleep=true;
+  if(!pose){lieDown("sleep");if(Math.random()<.6)showThought(pick(LINES.sleepy))}
+  placeZzz();zzz.classList.add("show")
+ }
+},4000);
+
+/* ---- 窗口尺寸变化时退出趴姿 ---- */
+window.addEventListener("resize",()=>{if(pose){clearPose();cancelGlide()}});
+
+/* ---- 调试钩子（自动化验证用）---- */
+window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy],edge:()=>edgeAtEnd(),box:()=>screenBox(),sim:(w,c)=>{drag0=w;lastPtr=c},
+ moveTo,wander:(d)=>wander(d|0),wa:()=>wa,pos:()=>readPos(),reloadBounds:()=>loadBounds(9),act,look,stopWalk,
+ flip:()=>img.classList.contains("flip"),walking:()=>walking,
+ lie:n=>{setPose(n)},
+ sleepNow:()=>{asleep=true;if(!pose)lieDown("sleep");placeZzz();zzz.classList.add("show")},
+ wake:()=>wake(true),state:()=>({pose,asleep,held,cls:mascot.className}),
+ blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on"))};
+
+apply();
+function loadBounds(tries){
+ invoke({type:"bounds"}).then(b=>{
+  if(!b||!(b.width>0))throw new Error("empty");
+  wa={x:b.x||0,y:b.y||0,width:b.width,height:b.height};
+  const p=readPos();pos.x=p.x;pos.y=p.y;
+  const lim=playBounds();
+  if(p.x<lim.minX-4||p.x>lim.maxX+4||p.y<lim.minY-4||p.y>lim.maxY+4){
+   moveTo(clamp(p.x,lim.minX,lim.maxX),clamp(p.y,lim.minY,lim.maxY),260);
+  }
+ }).catch(()=>{if((tries|0)<4)setTimeout(()=>loadBounds((tries|0)+1),600)});
+}
+loadBounds(0);
+scheduleIdle();
+}();
