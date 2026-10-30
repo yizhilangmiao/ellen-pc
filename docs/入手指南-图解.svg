@@ -1,0 +1,51 @@
+<svg viewBox="0 0 680 616" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Microsoft YaHei, PingFang SC, system-ui, sans-serif">
+  <title>艾莲项目上手流程</title>
+  <desc>从拿到仓库权限到日常提交的六步流程图</desc>
+  <rect x="0" y="0" width="680" height="616" fill="#FFFFFF"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <g>
+    <rect x="170" y="40" width="340" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="60" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#0C447C">① 拿到仓库权限</text>
+    <text x="340" y="79" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">发 GitHub 用户名 → 邮件接受邀请</text>
+  </g>
+  <path d="M340 96 L340 130" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="170" y="136" width="340" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="156" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#0C447C">② clone 到写死的固定路径</text>
+    <text x="340" y="175" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">E:\ailian\...\resources\app</text>
+  </g>
+  <path d="M340 192 L340 226" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="170" y="232" width="340" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="252" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#0C447C">③ 登录授权 + 配 git 身份</text>
+    <text x="340" y="271" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">浏览器授权一次 / user.name、longpaths</text>
+  </g>
+  <path d="M340 288 L340 322" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="170" y="328" width="340" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="348" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#0C447C">④ 单独拿仓库没有的东西</text>
+    <text x="340" y="367" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">runtime 1.4GB、data\、工具链</text>
+  </g>
+  <path d="M340 384 L340 418" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="170" y="424" width="340" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="444" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#0C447C">⑤ 自检并跑起来</text>
+    <text x="340" y="463" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">doctor.ps1 → test.ps1 → start-dev.ps1</text>
+  </g>
+  <path d="M340 480 L340 514" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="170" y="520" width="340" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+    <text x="340" y="540" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#085041">⑥ 日常干活循环</text>
+    <text x="340" y="559" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">pull → 占锁 → 改 → commit → push</text>
+  </g>
+</svg>
