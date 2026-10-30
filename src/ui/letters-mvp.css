@@ -1,11 +1,11 @@
 /* 信件 MVP：浮块 + 信纸卡片。测试版样式，够用就停。 */
 .letter-fab {
   position: fixed;
-  right: 18px;
-  bottom: 132px;
+  right: 1.125rem;
+  bottom: 8.25rem;
   z-index: 60;
-  width: 46px;
-  height: 46px;
+  width: 2.875rem;
+  height: 2.875rem;
   border: 1px solid rgba(214, 160, 180, 0.5);
   border-radius: 50%;
   background: rgba(32, 36, 41, 0.92);
@@ -19,30 +19,33 @@
   -webkit-app-region: no-drag;
 }
 .letter-fab:hover {
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
   background: rgba(48, 43, 47, 0.96);
 }
 .letter-fab[data-empty="1"] {
   opacity: 0.55;
 }
 .letter-fab svg {
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.6;
 }
 .letter-fab-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  top: -0.25rem;
+  right: -0.25rem;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.3125rem;
+  border-radius: 0.5625rem;
   background: #d6a0b4;
   color: #241a1e;
-  font: 600 11px/18px "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   text-align: center;
 }
 .letter-fab-badge[hidden] {
@@ -66,12 +69,12 @@
 
 .letter-card {
   position: relative;
-  width: min(520px, calc(100vw - 64px));
-  max-height: min(72vh, 660px);
+  width: min(32.5rem, calc(100vw - 4rem));
+  max-height: min(72vh, 41.25rem);
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(198, 201, 207, 0.28);
-  border-radius: 18px;
+  border-radius: 1.125rem;
   background: #202429f7;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
   color: #ece7e3;
@@ -80,31 +83,37 @@
 .letter-card-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 18px 22px 12px;
+  gap: 0.625rem;
+  padding: 1.125rem 1.375rem 0.75rem;
 }
 .letter-card-head h2 {
   margin: 0;
-  font: 600 16px/1.2 "Noto Serif SC", serif;
-  letter-spacing: 0.4px;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  font-family: "Noto Serif SC", serif;
+  letter-spacing: 0.03em;
 }
 .letter-card-stage {
-  padding: 2px 9px;
-  border-radius: 999px;
+  padding: 0.125rem 0.5625rem;
+  border-radius: 62.4375rem;
   background: rgba(214, 160, 180, 0.16);
   color: #e3b9c6;
-  font: 500 11px/18px "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
 }
 .letter-card-close {
   margin-left: auto;
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   background: transparent;
   color: rgba(236, 231, 227, 0.55);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1;
 }
 .letter-card-close:hover {
@@ -115,50 +124,68 @@
 .letter-body {
   flex: 1;
   overflow-y: auto;
-  padding: 4px 26px 20px;
+  padding: 0.25rem 1.625rem 1.25rem;
 }
 .letter-title {
-  margin: 6px 0 14px;
-  font: 600 19px/1.45 "Noto Serif SC", serif;
+  margin: 0.375rem 0 0.875rem;
+  font-weight: 600;
+  font-size: 1.1875rem;
+  line-height: 1.45;
+  font-family: "Noto Serif SC", serif;
   color: #f5efea;
 }
 .letter-text {
   white-space: pre-wrap;
-  font: 400 15px/1.95 "Noto Serif SC", serif;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  line-height: 1.95;
+  font-family: "Noto Serif SC", serif;
   color: rgba(236, 231, 227, 0.9);
 }
 .letter-sign {
-  margin-top: 18px;
-  padding-right: 4px;
+  margin-top: 1.125rem;
+  padding-right: 0.25rem;
   text-align: right;
-  font: 400 19px/1.4 KaiTi, STKaiti, serif;
+  font-weight: 400;
+  font-size: 1.1875rem;
+  line-height: 1.4;
+  font-family: KaiTi, STKaiti, serif;
   color: #d9c6ce;
 }
 .letter-empty {
-  padding: 30px 8px;
+  padding: 1.875rem 0.5rem;
   text-align: center;
-  font: 400 14px/1.8 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: rgba(236, 231, 227, 0.5);
 }
 
 .letter-foot {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 20px 14px;
+  gap: 0.625rem;
+  padding: 0.75rem 1.25rem 0.875rem;
   border-top: 1px solid rgba(198, 201, 207, 0.14);
 }
 .letter-foot .letter-hint {
-  font: 400 12px/1.5 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: rgba(236, 231, 227, 0.45);
 }
 .letter-btn {
   border: 1px solid rgba(214, 160, 180, 0.42);
-  border-radius: 10px;
-  padding: 6px 12px;
+  border-radius: 0.625rem;
+  padding: 0.375rem 0.75rem;
   background: rgba(214, 160, 180, 0.12);
   color: #f0dde3;
-  font: 500 12px/1.4 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   cursor: pointer;
 }
 .letter-btn:hover {
@@ -179,14 +206,17 @@
 .letter-writing {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 26px 0 10px;
+  gap: 0.375rem;
+  padding: 1.625rem 0 0.625rem;
   color: rgba(236, 231, 227, 0.62);
-  font: 400 14px/1.8 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
 }
 .letter-writing-dot {
-  width: 5px;
-  height: 5px;
+  width: 0.3125rem;
+  height: 0.3125rem;
   border-radius: 50%;
   background: rgba(214, 160, 180, 0.85);
   animation: letter-breath 1.3s ease-in-out infinite;
@@ -198,7 +228,7 @@
   animation-delay: 0.36s;
 }
 .letter-writing-text {
-  margin-left: 6px;
+  margin-left: 0.375rem;
   letter-spacing: 0.04em;
 }
 @keyframes letter-breath {
@@ -209,7 +239,7 @@
   }
   50% {
     opacity: 1;
-    transform: translateY(-2px);
+    transform: translateY(-0.125rem);
   }
 }
 /* 还没重写的底稿：压一点，别让人当成正文 */
@@ -234,18 +264,21 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 8px 20px 18px;
+  padding: 0.5rem 1.25rem 1.125rem;
   scrollbar-width: thin;
 }
 .letter-group {
-  margin-top: 14px;
+  margin-top: 0.875rem;
 }
 .letter-group-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 8px;
-  font: 500 12px/1 "Noto Sans SC", system-ui, sans-serif;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   letter-spacing: 0.16em;
   color: rgba(227, 185, 198, 0.72);
 }
@@ -258,12 +291,12 @@
 .letter-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   width: 100%;
-  margin-bottom: 6px;
-  padding: 10px 12px;
+  margin-bottom: 0.375rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid rgba(198, 201, 207, 0.14);
-  border-radius: 10px;
+  border-radius: 0.625rem;
   background: rgba(255, 255, 255, 0.02);
   color: inherit;
   text-align: left;
@@ -277,27 +310,36 @@
 .letter-item-main {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 0.1875rem;
   min-width: 0;
   flex: 1;
 }
 .letter-item-title {
-  font: 500 14px/1.4 "Noto Serif SC", serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-family: "Noto Serif SC", serif;
   color: rgba(240, 237, 229, 0.92);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .letter-item-meta {
-  font: 400 11px/1.4 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: rgba(236, 231, 227, 0.42);
 }
 .letter-item-flag {
   flex: none;
-  padding: 2px 6px;
-  border-radius: 6px;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
   border: 1px solid rgba(198, 201, 207, 0.2);
-  font: 400 10px/1.4 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: 1.4;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: rgba(236, 231, 227, 0.5);
 }
 .letter-item[data-unread="1"] .letter-item-title {
@@ -306,8 +348,8 @@
 .letter-item[data-unread="1"]::before {
   content: "";
   flex: none;
-  width: 5px;
-  height: 5px;
+  width: 0.3125rem;
+  height: 0.3125rem;
   border-radius: 50%;
   background: #d6a0b4;
 }
@@ -320,26 +362,26 @@
   justify-content: center;
 }
 .chat-letter-open svg {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 .chat-letter-open[data-empty="1"] {
   opacity: 0.6;
 }
 .chat-letter-open .letter-fab-badge {
-  top: -6px;
-  right: -8px;
-  min-width: 15px;
-  height: 15px;
-  font-size: 10px;
-  line-height: 15px;
+  top: -0.375rem;
+  right: -0.5rem;
+  min-width: 0.9375rem;
+  height: 0.9375rem;
+  font-size: 0.625rem;
+  line-height: 0.9375rem;
 }
 
 /* 入口外观：跟工具条其他按钮一致 */
 .chat-letter-open {
-  padding: 3px 7px;
+  padding: 0.1875rem 0.4375rem;
   border: 1px solid var(--theme-edge, #ffffff1f);
-  border-radius: 7px;
+  border-radius: 0.4375rem;
   background: #ffffff09;
   color: var(--theme-muted, #b9bcc4);
   cursor: pointer;
@@ -352,15 +394,18 @@
   border-color: #d6a0b466;
 }
 .chat-letter-open svg {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
 }
 
 .chat-letter-label {
-  font: 500 11px/1 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  line-height: 1;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   letter-spacing: 0.04em;
 }
 .chat-letter-open {
@@ -374,14 +419,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  min-height: 260px;
-  padding: 28px 18px;
+  gap: 0.875rem;
+  min-height: 16.25rem;
+  padding: 1.75rem 1.125rem;
   text-align: center;
 }
 .letter-locked-seal {
-  width: 62px;
-  height: 62px;
+  width: 3.875rem;
+  height: 3.875rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -389,22 +434,31 @@
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(214, 160, 180, 0.22), rgba(32, 36, 41, 0.9));
   color: #e9c2ce;
-  font: 500 20px/1 "Noto Serif SC", serif;
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-family: "Noto Serif SC", serif;
   letter-spacing: 0.1em;
 }
 .letter-locked-title {
-  font: 500 16px/1.5 "Noto Serif SC", serif;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: "Noto Serif SC", serif;
   color: rgba(240, 237, 229, 0.94);
 }
 .letter-locked-desc {
   max-width: 30em;
-  font: 400 13px/1.7 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: rgba(236, 231, 227, 0.55);
 }
 .letter-locked-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 4px;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
 }
 .letter-btn-primary {
   border-color: rgba(214, 160, 180, 0.6) !important;
@@ -418,9 +472,9 @@
    ============================================================ */
 .letter-rail {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   flex: none;
-  margin: 9px 0 2px;
+  margin: 0.5625rem 0 0.125rem;
 }
 .letter-rail-btn {
   position: relative;
@@ -428,13 +482,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
+  gap: 0.375rem;
+  padding: 0.5rem 0.375rem;
   border: 1px dashed rgba(214, 160, 180, 0.5);
-  border-radius: 12px 10px 13px 9px;
+  border-radius: 0.75rem 0.625rem 0.8125rem 0.5625rem;
   background: rgba(255, 255, 255, 0.035);
   color: #e2dbe1;
-  font: 400 12px/1.2 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   cursor: pointer;
   transition: background 160ms ease, border-color 160ms ease;
 }
@@ -443,29 +500,29 @@
   border-color: #d6a0b4;
 }
 .letter-rail-btn svg {
-  width: 15px;
-  height: 15px;
+  width: 0.9375rem;
+  height: 0.9375rem;
   opacity: 0.82;
 }
 .letter-rail-btn .letter-fab-badge {
-  top: -7px;
-  right: -4px;
+  top: -0.4375rem;
+  right: -0.25rem;
 }
 
 .letter-card {
   background: #f5f2ee;
   border: 1px solid #e2e4e8d6;
-  border-radius: 15px 15px 20px 15px;
+  border-radius: 0.9375rem 0.9375rem 1.25rem 0.9375rem;
   box-shadow: 0 26px 62px rgba(8, 10, 16, 0.56), inset 0 1px 0 #fff;
   color: #282a30;
   transform: rotate(-0.7deg);
 }
 .letter-bow {
   position: absolute;
-  top: -15px;
-  right: -7px;
-  width: 49px;
-  height: 36px;
+  top: -0.9375rem;
+  right: -0.4375rem;
+  width: 3.0625rem;
+  height: 2.25rem;
   transform: rotate(12deg);
   pointer-events: none;
   z-index: 2;
@@ -476,43 +533,49 @@
 }
 
 .letter-card-head {
-  padding: 16px 18px 10px;
-  gap: 8px;
+  padding: 1rem 1.125rem 0.625rem;
+  gap: 0.5rem;
   border-bottom: 2px dotted #e6d2da;
 }
 .letter-card-title {
   display: inline-flex;
   width: max-content;
-  max-width: calc(100% - 46px);
+  max-width: calc(100% - 2.875rem);
   align-items: center;
-  padding: 7px 13px;
+  padding: 0.4375rem 0.8125rem;
   border: 1px solid #e7b4c440;
-  border-radius: 19px 14px 18px 10px;
+  border-radius: 1.1875rem 0.875rem 1.125rem 0.625rem;
   background: #fff;
   color: #192029;
-  font: 400 16px/1.15 "Noto Serif SC", serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.15;
+  font-family: "Noto Serif SC", serif;
   transform: rotate(-1.6deg);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .letter-card-stage {
-  padding: 3px 7px;
-  border-radius: 8px;
+  padding: 0.1875rem 0.4375rem;
+  border-radius: 0.5rem;
   background: #e8e2e6;
   color: #7c7178;
-  font: 400 11px/1.2 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   white-space: nowrap;
 }
 .letter-card-close {
   margin-left: auto;
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   background: transparent;
   color: #b6acb2;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1;
   cursor: pointer;
 }
@@ -522,42 +585,54 @@
 }
 
 .letter-body {
-  padding: 6px 22px 18px;
+  padding: 0.375rem 1.375rem 1.125rem;
   scrollbar-width: thin;
   scrollbar-color: #c9bcc3 transparent;
 }
 .letter-title {
-  margin: 8px 0 12px;
-  font: 600 18px/1.5 "Noto Serif SC", serif;
+  margin: 0.5rem 0 0.75rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  font-family: "Noto Serif SC", serif;
   color: #22252b;
 }
 .letter-text {
   white-space: pre-wrap;
-  font: 400 15px/1.95 "Noto Serif SC", serif;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  line-height: 1.95;
+  font-family: "Noto Serif SC", serif;
   color: #343138;
   overflow-wrap: anywhere;
 }
 .letter-sign {
-  margin-top: 20px;
-  padding-right: 2px;
+  margin-top: 1.25rem;
+  padding-right: 0.125rem;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 4px;
-  font: 400 19px/1.4 KaiTi, STKaiti, serif;
+  gap: 0.25rem;
+  font-weight: 400;
+  font-size: 1.1875rem;
+  line-height: 1.4;
+  font-family: KaiTi, STKaiti, serif;
   font-style: italic;
   color: #a9a1a8;
 }
 .letter-sign::after {
   content: "♥";
-  font-size: 12px;
+  font-size: 0.75rem;
   font-style: normal;
   color: #d6a0b4;
 }
 .letter-empty {
-  padding: 26px 8px;
+  padding: 1.625rem 0.5rem;
   text-align: center;
-  font: 400 14px/1.8 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: #9a9199;
 }
 .letter-text-draft {
@@ -569,21 +644,27 @@
 }
 
 .letter-foot {
-  gap: 8px;
-  padding: 10px 18px 13px;
+  gap: 0.5rem;
+  padding: 0.625rem 1.125rem 0.8125rem;
   border-top: 2px dotted #e6d2da;
 }
 .letter-foot .letter-hint {
-  font: 400 12px/1.5 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: #9a9199;
 }
 .letter-btn {
   border: 1px solid #ddc0cb;
-  border-radius: 10px;
-  padding: 6px 12px;
+  border-radius: 0.625rem;
+  padding: 0.375rem 0.75rem;
   background: #fff;
   color: #6b5b63;
-  font: 400 12px/1.4 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   cursor: pointer;
 }
 .letter-btn:hover {
@@ -598,7 +679,10 @@
 /* 信匣：白纸上的条目 */
 .letter-group-title {
   color: #a98a97;
-  font: 500 12px/1 "Noto Sans SC", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   letter-spacing: 0.16em;
 }
 .letter-group-title::after {
@@ -606,7 +690,7 @@
 }
 .letter-item {
   border: 1px solid #e4dde2;
-  border-radius: 11px 9px 12px 8px;
+  border-radius: 0.6875rem 0.5625rem 0.75rem 0.5rem;
   background: #fff;
   color: #2e2b31;
 }
@@ -616,7 +700,10 @@
 }
 .letter-item-title {
   color: #262229;
-  font: 500 14px/1.4 "Noto Serif SC", serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-family: "Noto Serif SC", serif;
 }
 .letter-item-meta {
   color: #a29aa1;
@@ -628,37 +715,46 @@
 
 /* 软锁封面：同一张白纸 */
 .letter-locked {
-  padding: 34px 20px 30px;
+  padding: 2.125rem 1.25rem 1.875rem;
   text-align: center;
   color: #3a363d;
 }
 .letter-locked-seal {
-  width: 46px;
-  height: 46px;
-  margin: 0 auto 14px;
+  width: 2.875rem;
+  height: 2.875rem;
+  margin: 0 auto 0.875rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 32%, #e6bcc9, #b5697f 76%);
   color: #2a2024;
-  font: 600 16px/1 "Noto Serif SC", serif;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1;
+  font-family: "Noto Serif SC", serif;
   box-shadow: 0 4px 10px rgba(120, 60, 80, 0.28);
 }
 .letter-locked-title {
-  font: 500 16px/1.6 "Noto Serif SC", serif;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-family: "Noto Serif SC", serif;
   color: #2c2830;
 }
 .letter-locked-desc {
-  margin-top: 8px;
-  font: 400 13px/1.8 "Noto Sans SC", system-ui, sans-serif;
+  margin-top: 0.5rem;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  line-height: 1.8;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   color: #958c93;
 }
 .letter-locked-actions {
   display: flex;
-  gap: 10px;
+  gap: 0.625rem;
   justify-content: center;
-  margin-top: 18px;
+  margin-top: 1.125rem;
 }
 .letter-btn-primary {
   border: 1px solid #d6a0b4;
@@ -676,10 +772,10 @@
 }
 @keyframes letter-unfold {
   from {
-    clip-path: inset(0 0 100% 0 round 15px);
+    clip-path: inset(0 0 100% 0 round 0.9375rem);
   }
   to {
-    clip-path: inset(0 0 0 0 round 15px);
+    clip-path: inset(0 0 0 0 round 0.9375rem);
   }
 }
 
@@ -689,7 +785,7 @@
   left: 0;
   right: 0;
   top: 0;
-  height: 3px;
+  height: 0.1875rem;
   z-index: 3;
   pointer-events: none;
   background: linear-gradient(90deg, rgba(214, 160, 180, 0), #d6a0b4, rgba(214, 160, 180, 0));
@@ -706,7 +802,7 @@
   }
   100% {
     opacity: 0;
-    transform: translateY(-10px) scaleX(1);
+    transform: translateY(-0.625rem) scaleX(1);
   }
 }
 .reduce-ui-motion .letter-card[data-enter="1"],
@@ -733,14 +829,14 @@
 /* 蝴蝶结要出界：卡片本身不裁，交给 body/archive 各自裁 */
 .letter-card {
   overflow: visible;
-  max-height: min(70vh, 620px);
+  max-height: min(70vh, 38.75rem);
 }
 .letter-card .letter-foot {
-  border-radius: 0 0 20px 15px;
+  border-radius: 0 0 1.25rem 0.9375rem;
 }
 .letter-bow {
-  top: -16px;
-  right: -8px;
+  top: -1rem;
+  right: -0.5rem;
 }
 
 /* 溢出收进卡里：flex 子项必须给 min-height:0，否则正文会顶破卡片 */
@@ -751,8 +847,8 @@
   overscroll-behavior: contain;
 }
 .letter-card .letter-body {
-  padding: 2px 22px 16px;
+  padding: 0.125rem 1.375rem 1rem;
 }
 .letter-card .letter-body > .letter-title:first-child {
-  margin-top: 4px;
+  margin-top: 0.25rem;
 }
