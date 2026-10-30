@@ -1,0 +1,36 @@
+{
+  "id": "_模板",
+  "name": "模板角色",
+  "version": 1,
+  "theme": "ellen",
+  "guidance": "当轮接话.md",
+  "books": [],
+  "relationship": {
+    "allowRomance": true,
+    "scoring": true,
+    "note": "allowRomance 决定能不能升到恋人档；scoring 关掉则只读不评分；要改数值门槛就加 stageGates。",
+    "stageGates": null
+  },
+  "persona": {
+    "base": "这个角色怎么说话：句长、语气、习惯、边界。写行为，不写剧情。",
+    "knowledge": "这个角色知道什么、不知道什么：专长、盲区、对现实世界事物的判断依据。"
+  },
+  "appearance": {
+    "uiBase": "assets/ellen/",
+    "avatars": [
+      {
+        "id": "classic",
+        "label": "默认头像",
+        "file": "ellen-shortcut-avatar-v1.png"
+      }
+    ],
+    "background": "room-approved-night-v1.png"
+  },
+  "mascot": {
+    "uiBase": "assets/ellen/",
+    "stand": "ellen-mini-mascot-v1.png",
+    "swim": "ellen-swim-forward-v1.png",
+    "rest": "ellen-swim-rest-v1.png",
+    "size": 168
+  }
+}

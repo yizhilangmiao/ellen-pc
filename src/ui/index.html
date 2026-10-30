@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="emotion.css">
   <link rel="stylesheet" href="stickers.css">
   <link rel="stylesheet" href="appearance.css">
+  <link rel="stylesheet" href="letters-mvp.css">
   <link rel="stylesheet" href="conversation-manager.css">
   <link rel="stylesheet" href="milestones.css">
   <link rel="stylesheet" href="voice-provider-settings.css"><link rel="stylesheet" href="speech-volume.css">
@@ -62,7 +63,7 @@
     <header class="chat-header"><button class="avatar avatar-chat" data-action="appearance" aria-label="更换头像与背景" aria-haspopup="dialog" aria-controls="appearance-dialog"></button><div class="chat-identity"><div class="chat-title-row"><h1><span data-character-name>艾莲</span><i data-lucide="heart" class="pink-heart"></i></h1><div class="mood-control"><button id="mood-toggle" type="button" aria-expanded="false" aria-controls="mood-details"><span class="mood-dot" aria-hidden="true"></span><span id="mood-label">心情待更新</span></button>
       <section id="mood-details" popover="manual" aria-labelledby="mood-heading" hidden><header><div><span class="mood-caption">此刻的心情</span><strong id="mood-heading">心情待更新</strong></div><button id="mood-close" type="button" aria-label="收起心情">×</button></header><p id="mood-feeling"></p><p id="mood-reason">聊一会儿，心情会在这里慢慢记下来。</p><p id="mood-change" hidden></p><p id="mood-time"></p><p id="mood-warning" role="status" hidden></p></section>
     </div></div><p><b class="online-dot"></b><span id="presence-status">正在连接</span></p></div><button class="mini-affinity" data-action="relationship" aria-label="我们的关系"><span><i data-lucide="heart" class="pink-heart"></i><em data-affinity>—</em> / 100</span><span class="meter"><b></b></span><small data-relation-note>慢慢熟悉彼此</small></button><button class="chat-more icon-button" data-action="chat-options" aria-label="更多聊天选项"><i data-lucide="ellipsis"></i></button></header>
-    <div class="chat-toolbar"><button class="chat-focus-toggle" data-action="focus" type="button" aria-pressed="false"><i data-lucide="expand"></i><span>专注聊天</span></button><button class="room-view-toggle" data-action="space" type="button" title="看看房间" aria-label="看看房间"><i data-lucide="image"></i></button><div id="chat-model-picker" class="chat-model-picker" hidden>
+    <div class="chat-toolbar"><button class="chat-focus-toggle" data-action="focus" type="button" aria-pressed="false"><i data-lucide="expand"></i><span>专注聊天</span></button><button class="room-view-toggle" data-action="space" type="button" title="看看房间" aria-label="看看房间"><i data-lucide="image"></i></button><button class="chat-letter-open" data-action="letters" type="button" title="她留给你的信" aria-label="她留给你的信"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="2.2"></rect><path d="M3 7l9 6 9-6"></path></svg><span class="chat-letter-label">信</span><span class="letter-fab-badge" hidden></span></button><div id="chat-model-picker" class="chat-model-picker" hidden>
           <button id="chat-model-open" type="button" aria-expanded="false" aria-controls="chat-model-menu" title="切换聊天模型"><i data-lucide="cpu"></i><span id="chat-model-current"></span><i data-lucide="chevron-down"></i></button>
           <div id="chat-model-menu" class="chat-model-menu" role="group" aria-label="聊天模型" hidden>
             <label for="chat-model-select">聊天模型</label><div class="model-list-row"><select id="chat-model-select" aria-describedby="chat-model-scope"></select><button id="chat-model-refresh" type="button" title="刷新模型列表" aria-label="刷新模型列表"><i data-lucide="refresh-cw"></i></button></div>
@@ -89,6 +90,10 @@
     <section class="milestones-card" aria-labelledby="milestones-heading"><header><h2 id="milestones-heading" class="sticker-label">相处纪念</h2><button id="milestones-open" class="round-button" type="button" aria-label="管理相处纪念" aria-haspopup="dialog" aria-controls="milestone-dialog"><i data-lucide="pencil"></i></button></header><div id="milestone-days"></div><div id="milestone-upcoming"></div></section>
     <div class="life-divider" aria-hidden="true"><i data-lucide="heart"></i><span></span><i data-lucide="sparkles"></i></div>
     <section class="life-notes" aria-labelledby="life-notes-title"><header><h2 id="life-notes-title" class="sticker-label">艾莲的便签</h2><small id="ellen-note-date">小纸条</small></header><div class="note-paper"><svg class="note-bow" viewBox="0 0 60 44" aria-hidden="true"><path d="m25 18-9 22 9-3 4 6 4-24m1-1 6 23 4-8 8 2-12-20" fill="#d6a0b4" stroke="#efc5d6" stroke-width="1.2"/><path d="M27 14C17 2 5 2 4 8L7 25q3 6 20-5m7-6C45 3 56 3 56 10l-3 16q-4 5-19-6" fill="#e4b2c9" stroke="#f0c8db" stroke-width="1.2"/><path d="m25 14-13-4m14 8-14 4m23-7 13-5m-13 9 12 4" fill="none" stroke="#b77d99" stroke-width="1.3"/><rect x="25" y="12" width="11" height="12" rx="3" fill="#d49bb8" stroke="#f0c8db"/></svg><svg class="note-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M15 21v-4a2 2 0 0 1 2-2h4M7 8h10M7 12h6"/></svg><p id="ellen-note-text">还没有留下小纸条。</p><span aria-hidden="true">Ellen <i data-lucide="heart"></i></span></div><p id="ellen-note-warning" class="note-warning" role="status" hidden></p></section>
+    <nav class="letter-rail" aria-label="艾莲的信">
+      <button class="letter-rail-btn" data-action="letters" type="button" aria-label="艾莲的信"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M15 21v-4a2 2 0 0 1 2-2h4M7 8h10M7 12h6"/></svg><span>艾莲的信</span><span class="letter-fab-badge" hidden></span></button>
+      <button class="letter-rail-btn" data-action="letters-archive" type="button" aria-label="信匣"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 7.5 5.5 3h13L21 7.5M9 12h6"/></svg><span>信匣</span></button>
+    </nav>
     <div class="life-divider" aria-hidden="true"><i data-lucide="sparkles"></i><span></span><i data-lucide="moon"></i></div>
     <div class="life-art" aria-hidden="true"><p>尾巴不许碰。<br>鲨鱼借你抱。<i data-lucide="heart"></i></p><img src="assets/ellen/ellen-shark-hug-a5.png" alt="" draggable="false"></div>
   </aside>
@@ -184,6 +189,7 @@
   <script src="character-manager.js"></script>
   <script src="worldbook-manager.js"></script>
   <script src="appearance.js"></script>
+  <script src="letters-mvp.js"></script>
   <script src="conversation-manager.js"></script><script src="call-history.js"></script>
   <script src="milestones-model.js"></script><script src="milestones.js"></script>
   <script src="desktop-controls.js"></script>

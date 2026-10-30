@@ -1,0 +1,46 @@
+{
+  "id": "ellen-lover",
+  "name": "艾莲",
+  "version": 28,
+  "theme": "ellen",
+  "card": "核心卡.json",
+  "guidance": "当轮接话.md",
+  "books": [
+    "ellen-world",
+    "ellen-canon",
+    "ellen-background"
+  ],
+  "relationship": {
+    "allowRomance": true,
+    "scoring": true,
+    "note": "恋人卡：起始即恋人档（established_lovers），数值只记录本卡启用后的相处。"
+  },
+  "appearance": {
+    "uiBase": "assets/ellen/",
+    "avatars": [
+      {
+        "id": "classic",
+        "label": "冷淡艾莲",
+        "file": "ellen-shortcut-avatar-v1.png"
+      },
+      {
+        "id": "smile",
+        "label": "笑眯眯",
+        "file": "ellen-taskbar-chibi-v1.png"
+      },
+      {
+        "id": "sleepy",
+        "label": "抱鲨睡觉",
+        "file": "ellen-shark-hug-a5.png"
+      }
+    ],
+    "background": "room-approved-night-v1.png"
+  },
+  "mascot": {
+    "uiBase": "assets/ellen/",
+    "stand": "ellen-mini-mascot-v1.png",
+    "swim": "ellen-swim-forward-v1.png",
+    "rest": "ellen-swim-rest-v1.png",
+    "size": 168
+  }
+}

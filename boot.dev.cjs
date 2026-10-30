@@ -10,8 +10,13 @@
 const path = require("node:path");
 const { app, dialog } = require("electron");
 
-// 注意：沙箱开关只能在命令行传（appendSwitch 对 Chromium 启动来说太晚），见 start_ellen.bat。
-// 尤其不要在这里 disable-gpu —— 那会让整个界面走软件光栅化，拖动和挂件都会掉帧。
+// 沙箱在部分环境下初始化失败会让进程静默 exit 3 —— 表现就是「双击 exe 毫无反应」。
+// 必须在 require("electron") 之后、app.whenReady() 之前关：此时 Chromium 还没 fork renderer，
+// appendSwitch 仍然有效。这样就不必依赖 bat 传参数，双击 exe 即可启动。
+app.commandLine.appendSwitch("no-sandbox");
+app.commandLine.appendSwitch("disable-gpu-sandbox");
+
+// 不要 disable-gpu —— 那会让整个界面走软件光栅化，拖动和挂件都会掉帧。
 
 const kind = process.argv.includes("--story") ? "story" : "daily";
 

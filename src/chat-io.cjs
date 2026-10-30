@@ -13,7 +13,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const { randomUUID } = require("node:crypto");
+const { randomUUID, createHash } = require("node:crypto");
 
 const FORMAT = "ellen-chat-export";
 const VERSION = 1;
@@ -43,6 +43,21 @@ function safeTitle(t, fallback) {
 
 function pad(n) {
   return String(n).padStart(2, "0");
+}
+
+// 一段聊天的内容指纹：标题 + 每条消息的「角色/时间/正文」。
+// 同一个包重复导入时这段内容一字不差，指纹必然相同，用它挡住重复落库。
+// 用 \u0001 / \u0002 / \u0003 当分隔符，正文里出现普通换行也不会撞。
+function conversationFingerprint(title, messages) {
+  const lines = (Array.isArray(messages) ? messages : []).map((m) => {
+    const role = (m && m.role) || "";
+    const at = (m && typeof m.createdAt === "string" ? m.createdAt : "") || "";
+    const text = (m && typeof m.text === "string" ? m.text : "") || "";
+    return `${role}\u0001${at}\u0001${text}`;
+  });
+  return createHash("sha256")
+    .update(`${title}\u0002${lines.join("\u0003")}`)
+    .digest("hex");
 }
 
 function humanTime(iso) {
@@ -166,24 +181,35 @@ async function exportChats({ store, character, dialog, getWindow, app, conversat
   };
 }
 
-async function importChats({ store, dialog, getWindow }) {
+// 能导入的三种扩展名，统一放在一个对话框里选，选完再按后缀分派：
+//   .json / .ellenchat —— 电脑端「导出」得到的聊天记录
+//   .ellenpack         —— 手机端「资料备份 → 导出聊天资料」得到的资料文件
+const IMPORT_FILTERS = [
+  { name: "艾莲聊天记录 / 手机资料文件", extensions: ["json", "ellenchat", "ellenpack"] },
+];
+
+// 只弹框选文件，不读内容。返回路径或 null（取消）。
+async function pickImportFile({ dialog, getWindow }) {
   const r = await dialog.showOpenDialog(
     ...dialogOpts(getWindow && getWindow(), {
       title: "导入聊天记录",
       properties: ["openFile"],
-      filters: [{ name: "艾莲聊天记录", extensions: ["json", "ellenchat"] }],
+      filters: IMPORT_FILTERS,
     })
   );
   if (!r || r.canceled || !r.filePaths || !r.filePaths[0]) return null;
+  return r.filePaths[0];
+}
 
-  const file = r.filePaths[0];
-  const stat = fs.statSync(file);
+// 路径已知时直接读并落库（不弹框）。
+function importChatFile({ store, filePath }) {
+  const stat = fs.statSync(filePath);
   if (!stat.isFile()) throw Error("请选择一个聊天记录文件。");
   if (stat.size > MAX_IMPORT) throw Error("文件太大，最多 64 MB。");
 
   let text;
   try {
-    text = new TextDecoder("utf-8", { fatal: true }).decode(fs.readFileSync(file));
+    text = new TextDecoder("utf-8", { fatal: true }).decode(fs.readFileSync(filePath));
   } catch (e) {
     if (e && e.code === "ERR_ENCODING_INVALID_ENCODED_DATA") throw Error("这个文件不是有效的 UTF-8 文本。");
     throw e;
@@ -198,21 +224,44 @@ async function importChats({ store, dialog, getWindow }) {
   return applyImport(store, data);
 }
 
+async function importChats({ store, dialog, getWindow }) {
+  const file = await pickImportFile({ dialog, getWindow });
+  if (!file) return null;
+  return importChatFile({ store, filePath: file });
+}
+
 // 纯写入逻辑，不碰文件与对话框，方便单独测试。
 function applyImport(store, data) {
   if (!data || data.format !== FORMAT) throw Error("这不是艾莲导出的聊天记录文件。");
   if (data.version !== VERSION) throw Error(`聊天记录版本不支持：${data.version}。`);
   if (!Array.isArray(data.conversations) || !data.conversations.length) throw Error("文件里没有聊天记录。");
 
-  const result = { conversations: 0, messages: 0, skipped: 0, ids: [] };
+  const result = { conversations: 0, messages: 0, skipped: 0, repeated: 0, ids: [] };
+
+  // 先把库里已有的聊天做成指纹集合。同一个包第二次导入时整段内容一致，
+  // 直接跳过，不再新建一段一模一样的聊天（以前是每导一次多一份）。
+  const seen = new Set();
+  try {
+    for (const t of store.list()) {
+      seen.add(conversationFingerprint(t.title, store.messages(t.id)));
+    }
+  } catch (e) {
+    console.error("[chat-io] 读取已有聊天失败，本次不做重复检查", e && e.message);
+  }
 
   for (const c of data.conversations) {
     const title = safeTitle(c && c.title, "导入的聊天");
+    const msgs = Array.isArray(c && c.messages) ? c.messages : [];
+    const fingerprint = conversationFingerprint(title, msgs);
+    if (seen.has(fingerprint)) {
+      result.repeated += 1;
+      continue;
+    }
+    seen.add(fingerprint);
+
     const made = store.createConversation(title);
     result.conversations += 1;
     result.ids.push(made.id);
-
-    const msgs = Array.isArray(c && c.messages) ? c.messages : [];
     for (const m of msgs) {
       if (!m || (m.role !== "user" && m.role !== "assistant") || typeof m.text !== "string") {
         result.skipped += 1;
@@ -233,8 +282,24 @@ function applyImport(store, data) {
     }
   }
 
-  if (!result.messages) throw Error("文件里的聊天记录是空的，没有导入任何内容。");
+  if (!result.messages) {
+    if (result.repeated) throw Error("这段聊天已经导入过了，这次没有新增内容。");
+    throw Error("文件里的聊天记录是空的，没有导入任何内容。");
+  }
   return result;
 }
 
-module.exports = { exportChats, importChats, applyImport, buildPayload, buildMarkdown, portableMessage, FORMAT, VERSION };
+module.exports = {
+  exportChats,
+  importChats,
+  importChatFile,
+  pickImportFile,
+  IMPORT_FILTERS,
+  applyImport,
+  buildPayload,
+  buildMarkdown,
+  portableMessage,
+  conversationFingerprint,
+  FORMAT,
+  VERSION,
+};
