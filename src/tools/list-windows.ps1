@@ -1,5 +1,6 @@
-# 列出屏幕上可见的顶层窗口（标题 + 屏幕坐标），供小人模式「好奇观察」使用
-# 输出：JSON 数组 [{"title":"...","x":0,"y":0,"w":1200,"h":800}]
+# 列出屏幕上可见的顶层窗口（hwnd + 标题 + 进程 + 屏幕坐标），供小人模式「好奇观察」使用
+# 输出：JSON 数组 [{"id":"123456","title":"...","proc":"chrome","x":0,"y":0,"w":1200,"h":800}]
+# id 用窗口句柄：同一个窗口在它活着的时候保持不变，用来判断「是不是又开了一个新窗口」
 $ErrorActionPreference = 'SilentlyContinue'
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -16,6 +17,7 @@ public class Win32Enum {
   [DllImport("user32.dll")] public static extern int GetWindowTextLength(IntPtr hWnd);
   [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetWindowText(IntPtr hWnd, StringBuilder s, int n);
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT r);
+  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint pid);
   [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr hWnd, int attr, out int val, int size);
   [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
 }
@@ -38,7 +40,11 @@ $cb = [Win32Enum+EnumProc]{
   $w = $r.Right - $r.Left
   $hh = $r.Bottom - $r.Top
   if ($w -lt 360 -or $hh -lt 260) { return $true }
-  $null = $list.Add([pscustomobject]@{ title = $title; x = $r.Left; y = $r.Top; w = $w; h = $hh })
+  $procId = [uint32]0
+  [void][Win32Enum]::GetWindowThreadProcessId($h, [ref]$procId)
+  $proc = ''
+  try { $proc = (Get-Process -Id $procId -ErrorAction Stop).ProcessName.ToLower() } catch { $proc = '' }
+  $null = $list.Add([pscustomobject]@{ id = [string]$h.ToInt64(); title = $title; proc = $proc; x = $r.Left; y = $r.Top; w = $w; h = $hh })
   return $true
 }
 [void][Win32Enum]::EnumWindows($cb, [IntPtr]::Zero)

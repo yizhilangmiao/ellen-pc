@@ -89,3 +89,21 @@
 #mascot img.pet-blink{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;z-index:2;pointer-events:none;transition:opacity .07s linear;will-change:opacity}
 #mascot img.pet-blink.on{opacity:1}
 #mascot.pose-loaf img.pet-blink,#mascot.pose-sleep img.pet-blink,#mascot.pose-hug-left img.pet-blink,#mascot.pose-hug-right img.pet-blink{opacity:0!important}
+
+/* ===== 小设置面板：好奇提问频率（关 / 少 / 刚好 / 多） ===== */
+#options .option-label{display:block;margin:10px 11px 5px;font-size:11px;color:#c9afc2}
+#options .curiosity-choices{display:flex;gap:5px;margin:0 8px}
+#options .curiosity-choices button{flex:1 1 0;width:auto;min-width:0;text-align:center;padding:7px 0;margin:0;border:1px solid transparent;border-radius:9px;background:#ffffff0d;font-size:12px;line-height:1.2}
+#options .curiosity-choices button:hover{background:#e6bad321}
+#options .curiosity-choices button[aria-pressed=true]{background:#e6bad326;border-color:#efb8cf70;color:#ffdfed}
+
+/* ===== 好奇提问：气泡上的「回一句」+ 内联回复条 ===== */
+#thought #thought-reply{margin-top:9px;padding:4px 13px;border:1px solid #d9acbd;border-radius:999px;background:#ffe3ee;color:#7a4a5f;font-size:12px;line-height:1.3;cursor:pointer}
+#thought #thought-reply:hover{background:#ffd4e6}
+#curious-reply{position:absolute;left:12px;right:12px;top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:9px 10px;border:1px solid #efb8cf70;border-radius:16px;background:#412b39f5;box-shadow:0 6px 18px #0c071933}
+#curious-reply[hidden]{display:none}
+#curious-reply input{flex:1 1 120px;min-width:0;border:0;border-radius:10px;padding:8px 10px;background:#ffffff14;color:#ffe9f2;font-size:13px;font-family:inherit}
+#curious-reply input::placeholder{color:#c9afc2}
+#curious-reply button{border:0;border-radius:10px;padding:8px 14px;background:#f1abc1;color:#38222e;font-size:13px}
+#curious-reply button:disabled{opacity:.6}
+#curious-reply #reply-error{flex:1 1 100%;color:#ffc2d4;font-size:11px;line-height:1.4}

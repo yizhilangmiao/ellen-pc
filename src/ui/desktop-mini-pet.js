@@ -294,6 +294,7 @@ new MutationObserver(()=>{
 let fatigue=0,restAt=4+Math.floor(Math.random()*3),walkChain=0,restTimer=0;
 function wander(depth){
  if(held||asleep||walking||pose||panelOpen())return;
+ if(curiousBusy)return; // 正在问话，别自己溜达走
  if(fatigue>=restAt)return rest();
  const lim=playBounds();
  if(lim.maxX-lim.minX<80||lim.maxY-lim.minY<80)return;
@@ -341,50 +342,240 @@ function rest(){
  },280);
 }
 
-/* ---- 好奇观察：看一眼屏幕上的某个窗口，跑过去问一句 ----
-   主进程负责枚举窗口 + 截取该窗口缩略图 + 让视觉模型生成问题；
-   这里只负责「走过去、摆疑问姿态、冒气泡」。频率靠 scheduleCuriosity 控制。 ---- */
-let curiousBusy=false,curiousHold=0;
+/* ---- 好奇观察：看得见的窗口，而且记得住 ----
+   主进程 scan()（type:"windows"）只枚举窗口，标出「这次新开的」，很便宜；
+   真要开口时才 ask(id,mode) 截图 + 让模型生成一句话。
+   规则：同一个窗口只问一次「这是干什么的」，之后再来只问「还在弄吗」。
+   气泡上挂「回一句」，你回的话会连着她刚才的问句一起写进正式聊天。 ---- */
+let curiousBusy=false,curiousHold=0,pendingQuestion="",replyPending=false;
+let chatRef={threadId:void 0,libraryId:void 0};
+const replyBar=document.getElementById("curious-reply");
+const replyInput=document.getElementById("curious-input");
+const replySend=document.getElementById("curious-send");
+
+function canAskNow(){
+ return !(curiousBusy||held||asleep||walking||pose||panelOpen())&&
+  !(replyBar&&!replyBar.hidden)&&
+  !(BUSY.test(img.className||"")||mascot.classList.contains("pet-looking"));
+}
+function ensureReplyButton(){
+ if(!thought)return null;
+ let b=document.getElementById("thought-reply");
+ if(!b){
+  b=document.createElement("button");
+  b.id="thought-reply";b.type="button";b.textContent="回一句";
+  b.addEventListener("click",e=>{e.stopPropagation();openReply()});
+  thought.appendChild(b);
+ }
+ return b;
+}
+function hideReplyBar(){if(replyBar)replyBar.hidden=true}
 function endCurious(){
  clearTimeout(curiousHold);curiousHold=0;
+ hideReplyBar();
  if(mascot.classList.contains("pose-curious")){setPose("");oneShot(img,"pet-land",520)}
- curiousBusy=false;lastActive=Date.now();scheduleIdle();
+ curiousBusy=false;pendingQuestion="";lastActive=Date.now();scheduleIdle();
 }
-function startCurious(question){
- setPose("curious");
- fx("?",2);
- showThought(question,"",9000);
+/* 她开口：冒气泡、挂「回一句」。pose 为假时只说话不切问号立绘（日常闲聊用） */
+function startCurious(text,opts){
+ const o=opts||{},hold=o.hold||16000;
+ pendingQuestion=String(text||"");
+ if(o.pose!==false){setPose("curious");fx("?",2)}
+ showThought(pendingQuestion,"",hold);
+ ensureReplyButton();
  clearTimeout(curiousHold);
- curiousHold=setTimeout(endCurious,8500+Math.random()*4500);
+ curiousHold=setTimeout(endCurious,hold);
 }
-async function curiousAsk(){
- if(curiousBusy||held||asleep||walking||pose||panelOpen())return false;
- if(BUSY.test(img.className||"")||mascot.classList.contains("pet-looking"))return false;
+function openReply(){
+ if(!replyBar||!pendingQuestion)return;
+ // 聊天/通话/设置面板开着就别再插一条：会和面板叠在一起
+ if(panelOpen())return;
+ replyBar.hidden=false;
+ if(replyInput){replyInput.value="";try{replyInput.focus()}catch(_){}}
+ ensureReplyButton();
+ // 你在打字，就别让气泡到点自己消失
+ clearTimeout(curiousHold);
+ curiousHold=setTimeout(endCurious,90000);
+}
+function replyError(msg){
+ if(!replyBar)return;
+ replyBar.hidden=false;
+ let e=document.getElementById("reply-error");
+ if(!e){e=document.createElement("span");e.id="reply-error";replyBar.appendChild(e)}
+ e.textContent=msg;e.hidden=false;
+}
+async function sendReply(){
+ if(replyPending)return;
+ const text=replyInput&&replyInput.value?replyInput.value.trim():"";
+ if(!text)return;
+ if(void 0===chatRef.threadId){
+  try{const s=await invoke({type:"state"});if(s&&s.state)chatRef={threadId:s.state.threadId,libraryId:s.state.libraryId}}catch(_){}
+ }
+ replyPending=true;
+ if(replySend)replySend.disabled=true;
+ const q=pendingQuestion;
+ // 她的问句一起带进正式聊天：不然翻记录只看得到自己那句回复，不知道在回什么
+ const composed=q?"（她刚才问："+q+"）\n"+text:text;
+ try{
+  await invoke({type:"send",text:composed,threadId:chatRef.threadId,libraryId:chatRef.libraryId});
+  if(replyInput)replyInput.value="";
+  hideReplyBar();
+  pendingQuestion="";
+  showThought("嗯，我记着了。","",3600);
+  clearTimeout(curiousHold);
+  curiousHold=setTimeout(endCurious,3800);
+ }catch(err){
+  replyError(String(err&&err.message||err||"没发出去").replace(/^Error invoking remote method '[^']+': Error: /,""));
+ }finally{
+  replyPending=false;
+  if(replySend)replySend.disabled=false;
+ }
+}
+if(replySend)replySend.addEventListener("click",e=>{e.stopPropagation();sendReply()});
+if(replyInput)replyInput.addEventListener("keydown",e=>{
+ if("Enter"===e.key&&!e.isComposing){e.preventDefault();sendReply()}
+ else if("Escape"===e.key){e.preventDefault();hideReplyBar()}
+});
+
+/* ---- 频率档位：右键小设置里切换，改完立刻按新节奏重排 ---- */
+const CURIOUS_LEVELS={
+ off:{off:!0},
+ low:{scan:75000,newChance:.5,followChance:.15},
+ normal:{scan:40000,newChance:.7,followChance:.3},
+ high:{scan:22000,newChance:.95,followChance:.5}
+};
+const CURIOUS_KEYS=Object.keys(CURIOUS_LEVELS);
+let curiousLevel="normal";
+function normalizeCurious(v){return CURIOUS_KEYS.indexOf(v)>=0?v:"normal"}
+function pickWindow(list){
+ if(!list||!list.length)return null;
+ return list[Math.floor(Math.random()*list.length)];
+}
+
+/* 对着某个窗口走过去问一句；mode=first 只在该窗口第一次开口时用，主进程也会兜底纠正 */
+async function askAbout(win,mode){
+ if(!win||!canAskNow())return false;
  curiousBusy=true;
- // 等模型回话要几秒，先给个「嗯？」的反应，别像卡住一样干站着
- fx("?",1);showThought("嗯……那边在干嘛？","",4200);
+ // 兜底：中途无论卡在哪一步（模型不回、行走没回调），30 秒后自己解开
+ const guard=setTimeout(()=>{if(curiousBusy&&!pendingQuestion){curiousBusy=false;scheduleIdle()}},30000);
+ // 等模型看图要几秒，先给个即时反应，别干站着
+ fx("?",1);showThought(mode==="first"?"咦，新开的？":"还在弄呀？","",4200);
  let r=null;
- try{r=await invoke({type:"peek"})}catch(_){r=null}
- if(!r||!r.ok){curiousBusy=false;return false}
- if(held||asleep||pose||panelOpen()){curiousBusy=false;return false}
- const w=r.window||{},lim=playBounds(),sz=size();
+ try{r=await invoke({type:"ask",id:win.id,mode:mode})}catch(_){r=null}
+ if(!r||!r.ok){clearTimeout(guard);curiousBusy=false;return false}
+ // 等模型这几秒里她可能已经走了一步，走完再开口，别把问句丢了
+ for(let i=0;i<24&&walking;i++)await new Promise(res=>setTimeout(res,150));
+ if(held||asleep||panelOpen()){clearTimeout(guard);curiousBusy=false;return false}
+ const w=r.window||win,lim=playBounds(),sz=size();
  // 落点留出气泡宽度：气泡挂在窗口右上，太靠屏幕边会被裁掉
  const tx=clamp(Math.round(w.x+Math.min(70,Math.max(24,(w.w||300)*.12))),lim.minX+150,lim.maxX);
  const ty=clamp(Math.round(w.y+(w.h||400)-sz-4),lim.minY,lim.maxY);
  const cur=readPos();
- if(Math.hypot(tx-cur.x,ty-cur.y)<60)startCurious(r.question);
- else moveTo(tx,ty,undefined,()=>{if(!held&&!asleep&&!pose&&!panelOpen())startCurious(r.question);else{curiousBusy=false;scheduleIdle()}});
+ const speak=()=>{clearTimeout(guard);startCurious(r.question)};
+ // 注意：这里不能用 canAskNow()，curiousBusy 此刻就是 true，会把话吞掉
+ if(Math.hypot(tx-cur.x,ty-cur.y)<60)speak();
+ else moveTo(tx,ty,void 0,()=>{
+  clearTimeout(guard);
+  if(!held&&!asleep&&!panelOpen())speak();
+  else{curiousBusy=false;scheduleIdle()}
+ });
  return true;
 }
-function scheduleCuriosity(){
- clearTimeout(curiosityTimer);
- // 3.5~8 分钟一次机会；主进程还会按「用户是否真的在用电脑」二次过滤
- curiosityTimer=setTimeout(()=>{
-  const go=Math.random()<.65?curiousAsk():Promise.resolve(false);
-  go.catch(()=>{}).then(()=>scheduleCuriosity());
- },(5+Math.random()*6)*60000);
+
+/* 日常闲聊：不切立绘，纯说话，也能回一句 */
+const DAILY=[
+ "你刚刚是不是叹了口气。",
+ "要不要喝口水？我陪你歇会儿。",
+ "窗外好像有风。",
+ "我在这儿，不吵你。",
+ "坐久了记得伸个懒腰。",
+ "这段忙完，记得让眼睛歇一下。"
+];
+function dailyLine(){
+ if(!canAskNow())return false;
+ curiousBusy=true;
+ startCurious(DAILY[Math.floor(Math.random()*DAILY.length)],{pose:false,hold:11000});
+ return true;
 }
-let curiosityTimer=0;
+
+async function curiosityTick(){
+ const L=CURIOUS_LEVELS[curiousLevel]||CURIOUS_LEVELS.normal;
+ if(L.off||!canAskNow())return;
+ let r=null;
+ try{r=await invoke({type:"windows"})}catch(_){r=null}
+ if(!r||!r.ok)return;
+ if("number"==typeof r.idle&&r.idle>240)return; // 人不在电脑前，别自说自话
+ if(r.fresh&&r.fresh.length&&Math.random()<L.newChance){await askAbout(pickWindow(r.fresh),"first");return}
+ if(r.known&&r.known.length&&Math.random()<L.followChance){await askAbout(pickWindow(r.known),"follow");return}
+ if(Math.random()<.3)dailyLine();
+}
+
+let curiosityTimer=0,curiousSeq=0;
+function scheduleCuriosity(){
+ clearTimeout(curiosityTimer);curiosityTimer=0;
+ const L=CURIOUS_LEVELS[curiousLevel]||CURIOUS_LEVELS.normal;
+ if(L.off)return;
+ const seq=++curiousSeq;
+ curiosityTimer=setTimeout(async()=>{
+  if(seq!==curiousSeq)return;
+  try{await curiosityTick()}catch(_){}
+  if(seq===curiousSeq)scheduleCuriosity();
+ },L.scan+Math.random()*L.scan*.5);
+}
+function setCuriousLevel(v){
+ const next=normalizeCurious(v),changed=next!==curiousLevel;
+ curiousLevel=next;
+ // 换档就作废当前这条定时链，立刻按新节奏重排（正在问的那一轮不受影响）
+ if(changed){curiousSeq++;scheduleCuriosity()}
+ paintCuriousChoices();
+ return curiousLevel;
+}
+function paintCuriousChoices(){
+ const box=document.getElementById("curiosity-choices");
+ if(!box)return;
+ for(const b of box.querySelectorAll("button[data-curiosity]")){
+  b.setAttribute("aria-pressed",String(b.dataset.curiosity===curiousLevel));
+ }
+}
+function applyMiniPrefs(p){
+ if(p&&p.curiosity)setCuriousLevel(p.curiosity);
+}
+function bindCuriousChoices(){
+ const box=document.getElementById("curiosity-choices");
+ if(box){
+  box.addEventListener("click",e=>{
+   const b=e.target&&e.target.closest?e.target.closest("button[data-curiosity]"):null;
+   if(!b)return;
+   const v=b.dataset.curiosity;
+   setCuriousLevel(v); // 先本地生效：点下去马上有反馈，不必等主进程回包
+   invoke({type:"curiosity",value:v}).then(r=>applyMiniPrefs(r)).catch(()=>{});
+  });
+ }
+ paintCuriousChoices();
+ try{
+  window.desktopMini.subscribe(ev=>{
+   if(!ev)return;
+   if("preferences"===ev.type){applyMiniPrefs(ev.value);return}
+   // 记住当前线程：回复要原样带回主进程做校验，再进正式聊天
+   if("state"===ev.type||"snapshot"===ev.type){
+    const st=ev.value&&(ev.value.state||ev.value);
+    if(st)chatRef={threadId:st.threadId,libraryId:st.libraryId};
+   }
+  });
+ }catch(_){}
+ invoke({type:"state"}).then(s=>{
+  applyMiniPrefs(s&&s.preferences);
+  if(s&&s.state)chatRef={threadId:s.state.threadId,libraryId:s.state.libraryId};
+ }).catch(()=>{});
+ // 面板一打开就收起回复条，免得她和面板叠在一起
+ try{
+  const host=document.getElementById("mini-shell");
+  if(host)new MutationObserver(()=>{
+   if(replyBar&&!replyBar.hidden&&panelOpen())replyBar.hidden=true;
+  }).observe(host,{subtree:true,attributeFilter:["hidden"]});
+ }catch(_){}
+}
+bindCuriousChoices();
 
 /* ---- 小动作 ---- */
 let lookSeq=0;
@@ -413,6 +604,8 @@ function act(kind){
 function scheduleIdle(){clearTimeout(idleTimer);idleTimer=setTimeout(idleTick,7000+Math.random()*11000)}
 function idleTick(){
  if(held||asleep||walking||panelOpen())return scheduleIdle();
+ // 她正在问话/等回复：别让发呆小动作把这一幕打断
+ if(curiousBusy||(replyBar&&!replyBar.hidden))return scheduleIdle();
  if(pose){if(Math.random()<.22)fx("♪",2);else if(Math.random()<.08)showThought(pick(LINES.ambient));return scheduleIdle()}
  const r=Math.random();
  if(r<.5)wander(0);
@@ -494,7 +687,11 @@ window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy
  sleepNow:()=>{asleep=true;if(!pose)lieDown("sleep");placeZzz();zzz.classList.add("show")},
  wake:()=>wake(true),state:()=>({pose,asleep,held,cls:mascot.className}),
  blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on")),
- curious:()=>curiousAsk(),endCurious:()=>endCurious(),curiousNow:(q)=>{if(!q)return false;startCurious(q);return true},curiousBusy:()=>curiousBusy};
+ curious:()=>curiosityTick(),endCurious:()=>endCurious(),curiousNow:(q)=>{if(!q)return false;startCurious(q);return true},curiousBusy:()=>curiousBusy,
+ curiousLevel:()=>curiousLevel,setCuriousLevel:v=>setCuriousLevel(v),curiousTimer:()=>curiosityTimer,
+ scan:()=>invoke({type:"windows"}),askAbout:(w,m)=>askAbout(w,m),daily:()=>dailyLine(),openReply:()=>openReply(),
+ pending:()=>pendingQuestion,chatRef:()=>chatRef,replyError:()=>{const e=document.getElementById("reply-error");return e?e.textContent:""},
+ speak:(q,o)=>startCurious(q,o)};
 
 apply();
 function loadBounds(tries){
