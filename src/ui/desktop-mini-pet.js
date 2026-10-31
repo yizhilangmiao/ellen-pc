@@ -614,6 +614,11 @@ const MUSIC_REVIEW=[
  "有点吵，但吵得挺舒服。","这把嗓子的质感不错。","鼓点像踩着心跳。","听完想单曲循环，有点危险。","这个节奏，尾巴自己就打起拍子了。"
 ];
 let musicHumTimer=0,musicReviewAt=0;
+/* 被音乐吵醒时的第一句 */
+const MUSIC_WAKE=[
+ "……嗯？谁在放歌。","被吵醒了……不过这首还行。","醒了醒了，歌先别停。",
+ "我睡着呢——算了，听着睡也行。","音乐一响，睡意全跑了。","这个点放歌，是打算通宵吗。"
+];
 function scheduleHum(){
  clearTimeout(musicHumTimer);musicHumTimer=0;
  if(!musicPose)return;
@@ -626,8 +631,12 @@ function scheduleHum(){
   scheduleHum();
  },15000+Math.random()*20000);
 }
+// 睡着、趴着也允许被音乐叫起来（rest 状态不再拦），其它占用中再让路
+function musicResting(){
+ return asleep||"loaf"===pose||"sleep"===pose||"bottom"===pose||!!(img.className&&/cling-/.test(img.className));
+}
 function canStartMusic(){
- return !musicPose&&!asleep&&!held&&!walking&&!pose&&!curiousBusy&&!panelOpen()&&
+ return !musicPose&&!held&&!walking&&(musicResting()||!pose)&&!curiousBusy&&!panelOpen()&&
   !mascot.classList.contains("pose-curious")&&
   !(replyBar&&!replyBar.hidden)&&Date.now()>musicCooldownUntil;
 }
@@ -643,14 +652,20 @@ function startMusic(info){
   ar=String(info&&info.artist||"").trim().slice(0,16);
  // 文件名/超长标题念出来很奇怪，只保留像歌名的
  const t=(rawT.length>0&&rawT.length<=22&&!/\.(wav|mp3|flac|m4a|ogg|webm|mp4)$/i.test(rawT))?rawT:"";
+ // 睡着 / 趴着时被音乐叫起来：先收干净旧姿态，再坐下
+ const woke=asleep;
+ if(asleep)wake(false);
+ if(pose||(img.className&&/cling-/.test(img.className)))clearPose();
  musicPose=true;
  // 用 pose 占住姿态：这样空闲调度不会拉她散步、困了也不会趴下
  pose="music";
+ lastActive=Date.now();
  pendingQuestion="";hideReplyBar();hideReplyButton();
  setPose("music");
  oneShot(mascot,"pet-flop",520);
  let line;
- if(t&&ar&&Math.random()<.6)line=pick(MUSIC_LINES.named).replace("%t",t).replace("%a",ar);
+ if(woke)line=pick(MUSIC_WAKE);
+ else if(t&&ar&&Math.random()<.6)line=pick(MUSIC_LINES.named).replace("%t",t).replace("%a",ar);
  else if(t)line=pick(["《%t》啊，这首我听过。","在放《%t》，好听。","《%t》——记下了。"]).replace("%t",t);
  else line=pick(MUSIC_LINES.start);
  showThought(line,"",8200);
