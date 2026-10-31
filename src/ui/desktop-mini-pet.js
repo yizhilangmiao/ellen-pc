@@ -119,8 +119,14 @@ function fx(ch,n){for(let i=0;i<n;i++){const s=document.createElement("span");
 
 /* ---- 思考气泡台词（借用原有 #thought，按姿态选择锚定方向）---- */
 let lineTimer=0;
+const thoughtLog=[];
 function showThought(text,mode,holdMs){
- if(!thought)return;
+ if(!thought){
+  thoughtLog.push({at:Date.now(),hold:holdMs||0,why:"no-thought",txt:String(text).slice(0,18)});
+  return;
+ }
+ thoughtLog.push({at:Date.now(),hold:holdMs||0,from:((new Error).stack||"").split("\n")[2]||"",txt:String(text).slice(0,18)});
+ if(thoughtLog.length>80)thoughtLog.shift();
  const t=thought.querySelector("#thought-text")||thought.firstElementChild;
  if(t)t.textContent=text;
  thought.classList.remove("thought-top","thought-left","thought-right","below");
@@ -357,13 +363,15 @@ function rest(){
    规则：同一个窗口只问一次「这是干什么的」，之后再来只问「还在弄吗」。
    气泡上挂「回一句」，你回的话会连着她刚才的问句一起写进正式聊天。 ---- */
 let curiousBusy=false,curiousHold=0,pendingQuestion="",replyPending=false;
+/* 回了一句之后盯着聊天，把她正在生成的话一个字一个字冒到气泡里（详见 startChatWatch） */
+let chatWatch=null;
 let chatRef={threadId:void 0,libraryId:void 0};
 const replyBar=document.getElementById("curious-reply");
 const replyInput=document.getElementById("curious-input");
 const replySend=document.getElementById("curious-send");
 
 function canAskNow(){
- return !(curiousBusy||held||asleep||walking||pose||panelOpen())&&
+ return !(curiousBusy||chatWatch||held||asleep||walking||pose||panelOpen())&&
   !(replyBar&&!replyBar.hidden)&&
   !(BUSY.test(img.className||"")||mascot.classList.contains("pet-looking"));
 }
@@ -389,6 +397,7 @@ function hideReplyButton(){
 function hideReplyBar(){if(replyBar)replyBar.hidden=true}
 function endCurious(){
  clearTimeout(curiousHold);curiousHold=0;
+ stopChatWatch();
  hideReplyBar();
  hideReplyButton();
  if(mascot.classList.contains("pose-curious")){setPose("");oneShot(img,"pet-land",520)}
@@ -407,6 +416,7 @@ function startCurious(text,opts){
 }
 function openReply(){
  if(!replyBar||!pendingQuestion)return;
+ stopChatWatch();
  // 睡着也照样能回：先把人叫醒，不然她还在打呼，回复条像被吞了
  if(asleep)wake(false);
  // 面板开着：先收起面板（不然回复条被面板盖住），再把刚才那句问话摆回来
@@ -428,33 +438,121 @@ function replyError(msg){
  if(!e){e=document.createElement("span");e.id="reply-error";replyBar.appendChild(e)}
  e.textContent=msg;e.hidden=false;
 }
-async function sendReply(){
+/* ---- 她回你的话：一边生成一边冒到气泡里 ----
+   原来发完只会说一句「嗯，我记着了。」，真正的回答只出现在主窗口里，
+   小人窗口前一坐就是十几秒没动静。现在立刻给一句应答，然后每 650ms
+   看一眼聊天状态，把她这段时间新出现的 assistant 消息按最新文本显示出来。 */
+const CHAT_ACK=["嗯，我想想。","嗯……让我看看怎么回。","收到，等我一下。","嗯，我记下了。","欸，我想想啊。"];
+// 等待模型开口这段时间，让气泡里的字有点动静，别像卡住了
+const CHAT_THINK=["嗯，我想想。","嗯……让我理一下。","唔，马上。","……在想呢。","就快好了。"];
+let chatWatching=0;
+function stopChatWatch(keep){
+ const w=chatWatch;chatWatch=null;
+ if(w){clearTimeout(w.timer)}
+ if(!keep)hideReplyButton();
+}
+function cleanReply(s){
+ let t=String(s||"").replace(/\r/g,"").replace(/[*_`#>]+/g,"").replace(/\s*\n+\s*/g," ").replace(/\s{2,}/g," ").trim();
+ return t;
+}
+function clipReply(s){
+ const t=cleanReply(s);
+ if(t.length<=86)return t;
+ return t.slice(0,84).replace(/[，、；：,;:…\s]+$/,"")+"……";
+}
+function startChatWatch(seen){
+ stopChatWatch();
+ const w=chatWatch={seen:seen||new Set(),baseline:!seen,text:"",grewAt:0,startedAt:Date.now(),step:-1,until:Date.now()+120000,timer:0};
+ const tick=async()=>{
+  if(chatWatch!==w)return;
+  if(Date.now()>w.until){
+   // 兜底：两分钟还没等到，就当她没回，别一直挂着
+   chatWatch=null;
+   if(!w.text)showThought("……我一时不知道怎么接。","",4200);
+   hideReplyButton();lastActive=Date.now();
+   return;
+  }
+  let st=null;
+  try{const s=await invoke({type:"state"});st=s&&s.state}catch(_){}
+  if(chatWatch!==w)return;
+  if(st){
+   const msgs=Array.isArray(st.messages)?st.messages:[];
+   // 没拿到发送前的基线（state 一时没取到）：把这一次看到的当成基线，免得把上一轮回答当新回复
+   if(w.baseline){w.baseline=false;msgs.forEach(c=>w.seen.add(c.id))}
+   let m=null;
+   for(let i=msgs.length-1;i>=0;i--){
+    const c=msgs[i];
+    if(c&&c.role==="assistant"&&!w.seen.has(c.id)&&c.text&&c.text.trim()){m=c;break}
+   }
+   if(m){
+    const body=clipReply(m.text);
+    if(body&&body!==w.text){
+     const first=!w.text;
+     w.text=body;w.grewAt=Date.now();
+     showThought(body,"",120000);
+     if(first)fx("♪",1);
+    }
+   }
+   // 还没有一个字回来：让“在想”的措辞慢慢换一换，看起来她在斟酌
+   if(!w.text){
+    const step=Math.floor((Date.now()-w.startedAt)/2600);
+    if(step!==w.step){w.step=step;showThought(CHAT_THINK[step%CHAT_THINK.length],"",120000)}
+   } else if(thought&&thought.hidden&&!panelOpen()){
+    // 中途被别的短气泡（摸头/小动作）顶掉过：把她的回答重新摆回来
+    showThought(w.text,"",120000);
+   }
+   // 她说完了：把最后那句多留一会儿再收
+   if(w.text&&!st.busy){
+    chatWatch=null;
+    clearTimeout(w.timer);
+    const stay=4200+Math.min(4000,w.text.length*60);
+    showThought(w.text,"",stay);
+    hideReplyButton();
+    lastActive=Date.now();
+    setTimeout(()=>{if(!chatWatch)scheduleIdle()},stay+400);
+    return;
+   }
+  }
+  w.timer=setTimeout(tick,650);
+ };
+ w.timer=setTimeout(tick,650);
+}
+function sendReply(){
  if(replyPending)return;
  const text=replyInput&&replyInput.value?replyInput.value.trim():"";
  if(!text)return;
- if(void 0===chatRef.threadId){
-  try{const s=await invoke({type:"state"});if(s&&s.state)chatRef={threadId:s.state.threadId,libraryId:s.state.libraryId}}catch(_){}
- }
  replyPending=true;
  if(replySend)replySend.disabled=true;
  const q=pendingQuestion;
  // 她的问句一起带进正式聊天：不然翻记录只看得到自己那句回复，不知道在回什么
  const composed=q?"（她刚才问："+q+"）\n"+text:text;
- try{
-  await invoke({type:"send",text:composed,threadId:chatRef.threadId,libraryId:chatRef.libraryId});
+ // 点了就立刻有反应，不等主进程/模型：先收回回复条，冒一句应答
+ hideReplyBar();
+ hideReplyButton();
+ pendingQuestion="";
+ clearTimeout(curiousHold);
+ showThought(pick(CHAT_ACK),"",120000);
+ (async()=>{
+  let seen=null;
+  try{
+   const s=await invoke({type:"state"});
+   if(s&&s.state){chatRef={threadId:s.state.threadId,libraryId:s.state.libraryId};seen=new Set((s.state.messages||[]).map(m=>m.id))}
+  }catch(_){}
+  startChatWatch(seen||new Set());
   if(replyInput)replyInput.value="";
-  hideReplyBar();
-  hideReplyButton();
-  pendingQuestion="";
-  showThought("嗯，我记着了。","",3600);
-  clearTimeout(curiousHold);
-  curiousHold=setTimeout(endCurious,3800);
- }catch(err){
-  replyError(String(err&&err.message||err||"没发出去").replace(/^Error invoking remote method '[^']+': Error: /,""));
- }finally{
-  replyPending=false;
-  if(replySend)replySend.disabled=false;
- }
+  try{
+   await invoke({type:"send",text:composed,threadId:chatRef.threadId,libraryId:chatRef.libraryId});
+  }catch(err){
+   stopChatWatch();
+   if(replyInput&&text)replyInput.value=text;
+   pendingQuestion=q;ensureReplyButton();
+   showThought(q||"……我这边正忙，等一下再说。","",q?90000:4600);
+   replyError(String(err&&err.message||err||"没发出去").replace(/^Error invoking remote method '[^']+': Error: /,""));
+  }finally{
+   replyPending=false;
+   if(replySend)replySend.disabled=false;
+  }
+ })();
 }
 if(replySend)replySend.addEventListener("click",e=>{e.stopPropagation();sendReply()});
 if(replyInput)replyInput.addEventListener("keydown",e=>{
@@ -624,7 +722,7 @@ function scheduleHum(){
  if(!musicPose)return;
  musicHumTimer=setTimeout(()=>{
   // 别盖住正在显示的评价/问句
-  if(musicPose&&!panelOpen()&&!curiousBusy&&!(replyBar&&!replyBar.hidden)&&thought&&thought.hidden){
+  if(musicPose&&!panelOpen()&&!curiousBusy&&!chatWatch&&!(replyBar&&!replyBar.hidden)&&thought&&thought.hidden){
    showThought(pick(MUSIC_HUM),"",3200+Math.random()*1600);
    fx("♪",1);
   }
@@ -636,13 +734,13 @@ function musicResting(){
  return asleep||"loaf"===pose||"sleep"===pose||"bottom"===pose||!!(img.className&&/cling-/.test(img.className));
 }
 function canStartMusic(){
- return !musicPose&&!held&&!walking&&(musicResting()||!pose)&&!curiousBusy&&!panelOpen()&&
+ return !musicPose&&!held&&!walking&&(musicResting()||!pose)&&!curiousBusy&&!chatWatch&&!panelOpen()&&
   !mascot.classList.contains("pose-curious")&&
   !(replyBar&&!replyBar.hidden)&&Date.now()>musicCooldownUntil;
 }
 // 听歌时 pose 被占着，canAskNow() 会一直返回 false，这里用一条专用判断
 function canSpeakMusic(){
- return musicPose&&!asleep&&!held&&!walking&&!curiousBusy&&!panelOpen()&&
+ return musicPose&&!asleep&&!held&&!walking&&!curiousBusy&&!chatWatch&&!panelOpen()&&
   !(replyBar&&!replyBar.hidden)&&
   !(BUSY.test(img.className||"")||mascot.classList.contains("pet-looking"));
 }
@@ -832,7 +930,7 @@ function idleTick(){
  // 听歌时她就坐在那儿，不溜达、不做小动作
  if(musicPose)return scheduleIdle();
  // 她正在问话/等回复：别让发呆小动作把这一幕打断
- if(curiousBusy||(replyBar&&!replyBar.hidden))return scheduleIdle();
+ if(chatWatch||curiousBusy||(replyBar&&!replyBar.hidden))return scheduleIdle();
  if(pose){if(Math.random()<.22)fx("♪",2);else if(Math.random()<.08)showThought(pick(LINES.ambient));return scheduleIdle()}
  const r=Math.random();
  if(r<.5)wander(0);
@@ -921,7 +1019,7 @@ window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy
  musicHum:()=>scheduleHum(),musicReviewAt:()=>musicReviewAt,musicSpeakable:()=>canSpeakMusic(),
  musicTrack:()=>musicTrack,setMusicTrack:v=>{musicTrack=String(v||"")},
  scan:()=>invoke({type:"windows"}),askAbout:(w,m)=>askAbout(w,m),daily:()=>dailyLine(),openReply:()=>openReply(),
- pending:()=>pendingQuestion,chatRef:()=>chatRef,replyError:()=>{const e=document.getElementById("reply-error");return e?e.textContent:""},
+ pending:()=>pendingQuestion,chatRef:()=>chatRef,chatWatching:()=>!!chatWatch,chatText:()=>chatWatch?chatWatch.text:"",thoughtLog:()=>thoughtLog.slice(-10),sendTest:(t)=>{replyPending=false;if(replyInput)replyInput.value=String(t||"测试");sendReply();return "sent"},replyError:()=>{const e=document.getElementById("reply-error");return e?e.textContent:""},
  speak:(q,o)=>startCurious(q,o)};
 
 apply();
