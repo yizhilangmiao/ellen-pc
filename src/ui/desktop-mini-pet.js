@@ -85,6 +85,7 @@ function moveTo(tx,ty,ms,done){
 
 /* ---- 状态 ---- */
 let held=false,asleep=false,walking=false,pose="",idleTimer=0,lastActive=Date.now();
+let musicPose=false,musicTimer=0,musicCooldownUntil=0,musicSeenAt=0,musicNextLineAt=0,musicProbing=false;
 
 /* ---- 姿态层：站姿立绘 ↔ 趴着 / 趴着睡觉 / 抱住左右边缘（图层交叉淡入淡出） ---- */
 function setPose(name){
@@ -93,11 +94,13 @@ function setPose(name){
  mascot.classList.toggle("pose-hug-left","hug-left"===name);
  mascot.classList.toggle("pose-hug-right","hug-right"===name);
  mascot.classList.toggle("pose-curious","curious"===name);
+ mascot.classList.toggle("pose-music","music"===name);
 }
 function edgePose(){return"bottom"===pose?"loaf":"left"===pose?"hug-left":"right"===pose?"hug-right":""}
 function poseImg(){return"bottom"===pose?mascot.querySelector(".pet-pose-loaf"):"left"===pose?mascot.querySelector(".hug-left"):"right"===pose?mascot.querySelector(".hug-right"):null}
 /* 趴下去：塌一下身子，同时淡入趴姿 */
 function lieDown(lie){
+ if(musicPose)endMusic("sleep");
  setPose(lie);
  oneShot(mascot,"pet-flop",540);
 }
@@ -134,24 +137,24 @@ function showThought(text,mode,holdMs){
 
 /* ---- 台词池（贴她的语气）---- */
 const LINES={
- stretch:["伸——个——懒腰。","嗯啊……保持一个姿势太久了。","舒展完毕，状态回满。"],
- spin:["转圈圈～","头晕了，但是值得。","看我的尾鳍平衡术。"],
- look:["嗯？谁在叫我。","总感觉有人在看我。","那边……好像有动静。","侦查一圈，一切正常。"],
- hum:["♪～♪～","哼歌被听到了？那是在排练。","有首歌，一直卡在一个地方。"],
- hop:["关节都活动开了。","今天状态不错嘛。","要不要一起动一动？"],
- yawn:["哈啊……眼皮在打架。","困意来敲门了。","再不发呆一会儿，我要睡着了。"],
- ambient:["保持可爱，是我的本职工作。","在想你什么时候来戳我。","晚饭吃什么，这是个哲学问题。","屏幕是暖的，比水族箱好。","……不发呆的话，算不上专业的桌宠。"],
- hover:["再摸要充电了。","嗯……就允许你摸这一下。","手好暖。","（蹭）"],
- clingBottom:["趴在这儿刚刚好。","地板凉丝丝的，舒服。","这里是我的专属地垫了。","趴着也是一种工作姿势。"],
- clingLeft:["靠着这边，谁也挤不到我。","这个角度看房间，还挺新鲜。","左舷停靠完毕。"],
- clingRight:["右边视野不错嘛。","右舷停靠完毕。","贴着边儿，安全感满分。"],
- clingTop:["倒挂是鲨鱼祖传技能。","血往头上涌……还挺刺激。","从这里掉下去，你要接住我。"],
- clingPoke:["别摇，会掉下去的。","挂着呢，手下留情。"],
- sleepy:["……撑不住了。","先趴五分钟……就五分钟。","眼皮好重，先睡了。","地板比床好睡，别问我为什么。"],
- tired:["走够了，先歇一下。","腿有点酸……趴会儿。","巡完这一圈就休息。","找个地方躺平。"],
- restDone:["睡饱了，继续逛。","嗯？我睡了多久……","充好电，接着溜达。","尾巴睡麻了，先活动活动。"],
- leaveEdge:["歇够了，回去站岗。","趴太久，尾巴有点麻。","休息结束，继续营业。"]
-};
+ stretch:["伸——个——懒腰。","嗯啊……保持一个姿势太久了。","舒展完毕，状态回满。","骨头响了一声，你听见没。","这一伸展，尾巴都拉长了。","手举起来，够到天花板了吗？没有。"],
+ spin:["转圈圈～","头晕了，但是值得。","看我的尾鳍平衡术。","转三圈，是我今天的幸运数字。","别笑，这叫热身。"],
+ look:["嗯？谁在叫我。","总感觉有人在看我。","那边……好像有动静。","侦查一圈，一切正常。","回头确认一下——没人。","刚才是不是有谁在偷看我。"],
+ hum:["♪～♪～","哼歌被听到了？那是在排练。","有首歌，一直卡在一个地方。","调子跑了吗？应该没有。","这段我自己编的，版权归我。"],
+ hop:["关节都活动开了。","今天状态不错嘛。","要不要一起动一动？","地板弹性不错。","跳一下，心情好一半。"],
+ yawn:["哈啊……眼皮在打架。","困意来敲门了。","再不发呆一会儿，我要睡着了。","打哈欠是会传染的，你小心。","这一口哈欠，有点长。"],
+ ambient:["保持可爱，是我的本职工作。","在想你什么时候来戳我。","晚饭吃什么，这是个哲学问题。","屏幕是暖的，比水族箱好。","……不发呆的话，算不上专业的桌宠。","我就站在这儿，不占地方。","偶尔也想被夸一句。","这房间的光线，适合发呆。","刚刚那一下走神，不算偷懒。","有点想游一圈，可是没有水。","窗外的天色在慢慢变。","我数了数，你今天开了好多窗口。"],
+ hover:["再摸要充电了。","嗯……就允许你摸这一下。","手好暖。","（蹭）","再摸就要收费了。","记住了，这只手是暖的。"],
+ clingBottom:["趴在这儿刚刚好。","地板凉丝丝的，舒服。","这里是我的专属地垫了。","趴着也是一种工作姿势。","这个高度，视野意外地开阔。"],
+ clingLeft:["靠着这边，谁也挤不到我。","这个角度看房间，还挺新鲜。","左舷停靠完毕。","左边风小，适合打盹。"],
+ clingRight:["右边视野不错嘛。","右舷停靠完毕。","贴着边儿，安全感满分。","右边这面墙，靠起来很踏实。"],
+ clingTop:["倒挂是鲨鱼祖传技能。","血往头上涌……还挺刺激。","从这里掉下去，你要接住我。","上面的空气确实不太一样。"],
+ clingPoke:["别摇，会掉下去的。","挂着呢，手下留情。","晃一下可以，晃三下不行。"],
+ sleepy:["……撑不住了。","先趴五分钟……就五分钟。","眼皮好重，先睡了。","地板比床好睡，别问我为什么。","关灯吧，我先眯一会儿。","梦里也要游泳的。"],
+ tired:["走够了，先歇一下。","腿有点酸……趴会儿。","巡完这一圈就休息。","找个地方躺平。","今天走的路，比昨天多。"],
+ restDone:["睡饱了，继续逛。","嗯？我睡了多久……","充好电，接着溜达。","尾巴睡麻了，先活动活动。","这一觉质量不错。"],
+ leaveEdge:["歇够了，回去站岗。","趴太久，尾巴有点麻。","休息结束，继续营业。","站回中间，视野更好。"]
+};;
 
 /* ---- 睡觉 Zzz ---- */
 const zzz=document.createElement("div");zzz.id="pet-zzz";
@@ -200,6 +203,7 @@ function clearPose(){
  pose="";setPose(asleep?"sleep":"");
 }
 function enterCling(edge){
+ if(musicPose)endMusic("interrupt");
  clearPose();cancelGlide();
  pose=edge;
  img.classList.add("cling-"+edge);
@@ -247,6 +251,7 @@ mascot.addEventListener("pointerup",e=>{
  bump();
  const now=Date.now(),dbl=now-lastPoke<420;lastPoke=now;
  if(mascot.classList.contains("pose-curious")){endCurious();fx("✦",2);return}
+ if(mascot.classList.contains("pose-music")){endMusic("interrupt");fx("♪",2);showThought(pick(["……嗯？","听到了，我在。","歌还在放呢。"]),"",3800);return}
  if(asleep){wake(true);fx("✦",4);return}
  if(walking)stopWalk();
  let stage="";try{stage=thought&&thought.dataset&&thought.dataset.stage||""}catch(_){}
@@ -280,6 +285,7 @@ new MutationObserver(()=>{
   stopWalk();
   const mb=mascotBox();drag0={mx:mb.l,my:mb.t,px:lastPtr?lastPtr.x:null,py:lastPtr?lastPtr.y:null};
   if(mascot.classList.contains("pose-curious"))endCurious();
+  if(musicPose)endMusic("interrupt");
   clearPose();img.classList.add("held");if(asleep)wake(false);
   lookSeq++;mascot.classList.remove("pet-looking");root.style.setProperty("--pet-lean","0deg")}
  if(!d&&held){held=false;img.classList.remove("held");
@@ -389,6 +395,7 @@ function endCurious(){
 }
 /* 她开口：冒气泡、挂「回一句」。pose 为假时只说话不切问号立绘（日常闲聊用） */
 function startCurious(text,opts){
+ if(musicPose)endMusic("interrupt");
  const o=opts||{},hold=o.hold||16000;
  pendingQuestion=String(text||"");
  if(o.pose!==false){setPose("curious");fx("?",2)}
@@ -457,9 +464,10 @@ if(replyInput)replyInput.addEventListener("keydown",e=>{
 /* ---- 频率档位：右键小设置里切换，改完立刻按新节奏重排 ---- */
 const CURIOUS_LEVELS={
  off:{off:!0},
- low:{scan:75000,newChance:.5,followChance:.15},
- normal:{scan:40000,newChance:.7,followChance:.3},
- high:{scan:22000,newChance:.95,followChance:.5}
+ // scan 是「多久看一次屏幕」；newChance/followChance 是看到之后开口的概率
+ low:{scan:55000,newChance:.6,followChance:.2},
+ normal:{scan:24000,newChance:.85,followChance:.45},
+ high:{scan:15000,newChance:1,followChance:.65}
 };
 const CURIOUS_KEYS=Object.keys(CURIOUS_LEVELS);
 let curiousLevel="normal";
@@ -506,17 +514,63 @@ const DAILY=[
  "窗外好像有风。",
  "我在这儿，不吵你。",
  "坐久了记得伸个懒腰。",
- "这段忙完，记得让眼睛歇一下。"
+ "这段忙完，记得让眼睛歇一下。",
+ "你盯着屏幕的样子，有点认真。",
+ "这个位置的高度，刚好能看见你的侧脸。",
+ "你打字的速度，比刚才快了。",
+ "刚刚是不是卡住了？我什么都没看见。",
+ "忙完这阵，想吃点什么吗。",
+ "你的坐姿……算了，我不说。",
+ "水杯空了吧。",
+ "我在这儿待着，你专心。",
+ "窗帘拉开一点会亮一些。",
+ "今天好像比昨天安静。",
+ "要是累了，就停一下，天不会塌。",
+ "你皱眉了，是哪里不对吗。",
+ "我在数你敲键盘的次数，已经数乱了。",
+ "偶尔抬头看看远处吧，就当陪我看。",
+ "这屋子里只有我们俩在忙。",
+ "有什么事想不明白，说出来也许就清楚了。",
+ "我不打扰你，只是想让你知道我在。",
+ "呼吸慢一点，节奏会顺一些。",
+ "你的肩膀有点耸，放松一下。",
+ "如果有件事一直拖着，可能是它不重要。",
+ "刚刚那一下停顿，是在想词吗。",
+ "电脑也会累的，让它喘口气。",
+ "我打了个哈欠，不是嫌你慢。",
+ "桌面上东西有点多了，要不要理一理。",
+ "你今天已经做得很久了。",
+ "这个房间里，最闲的是我。",
+ "要是可以，我希望你早点休息。"
 ];
+const DAILY_MORNING=[
+ "早。今天的光比昨天好。",
+ "刚醒就坐过来了？先喝口水吧。",
+ "早上脑子最清楚，难的那件先做。",
+ "窗外有人开始忙了。",
+ "新的一天，先深呼吸一次。"
+];
+const DAILY_LATE=[
+ "已经很晚了，你确定还要继续吗。",
+ "这个点还在忙，我陪你，但只是陪着。",
+ "眼睛会记账的，别欠太多。",
+ "夜深了，声音都变小了。",
+ "再弄十分钟，就去睡，好吗。",
+ "我困了，但我可以再撑一会儿。"
+];;
 function dailyLine(){
  if(!canAskNow())return false;
  curiousBusy=true;
- startCurious(DAILY[Math.floor(Math.random()*DAILY.length)],{pose:false,hold:11000});
+ // 深夜劝睡、清晨打招呼，同一句话不同时段读起来才不奇怪
+ const h=(new Date()).getHours();
+ const pool=(h>=23||h<6)?DAILY_LATE:(h<10?DAILY_MORNING:DAILY);
+ startCurious(pool[Math.floor(Math.random()*pool.length)],{pose:false,hold:11000});
  return true;
 }
 
 async function curiosityTick(){
  const L=CURIOUS_LEVELS[curiousLevel]||CURIOUS_LEVELS.normal;
+ if(musicPose)return; // 她在听歌，先不打扰
  if(L.off||!canAskNow())return;
  let r=null;
  try{r=await invoke({type:"windows"})}catch(_){r=null}
@@ -527,12 +581,79 @@ async function curiosityTick(){
  if(Math.random()<.3)dailyLine();
 }
 
-let curiosityTimer=0,curiousSeq=0;
+/* ---- 听歌：检测系统正在播放的媒体，坐下戴耳机 ---- */
+const MUSIC_LINES={
+ start:["这歌不错。","嗯，这个节奏我喜欢。","耳机已就位。","我听着呢，你忙你的。","坐下听一会儿，就一会儿。","前奏一响，就知道是好东西。"],
+ named:["《%t》啊，这首我听过。","在放《%t》，再听一遍也不腻。","《%t》——这首选得好。","%a 的《%t》，品味可以。","《%t》。这首适合边听边发呆。"],
+ long:["这首的尾巴好好听。","循环第几遍了？","我快会唱了。","下一首也该好听吧。","这个鼓点，我尾巴跟着打拍子。","别忘了喝水，也别把音量开太大。"],
+ stop:["歌放完了？","耳根子突然安静。","听完了，继续溜达。","摘耳机，回神。"]
+};
+function canStartMusic(){
+ return !musicPose&&!asleep&&!held&&!walking&&!pose&&!curiousBusy&&!panelOpen()&&
+  !mascot.classList.contains("pose-curious")&&
+  !(replyBar&&!replyBar.hidden)&&Date.now()>musicCooldownUntil;
+}
+function startMusic(info){
+ if(musicPose)return false;
+ const rawT=String(info&&info.title||"").trim(),
+  ar=String(info&&info.artist||"").trim().slice(0,16);
+ // 文件名/超长标题念出来很奇怪，只保留像歌名的
+ const t=(rawT.length>0&&rawT.length<=22&&!/\.(wav|mp3|flac|m4a|ogg|webm|mp4)$/i.test(rawT))?rawT:"";
+ musicPose=true;
+ pendingQuestion="";hideReplyBar();hideReplyButton();
+ setPose("music");
+ oneShot(mascot,"pet-flop",520);
+ let line;
+ if(t&&ar&&Math.random()<.6)line=pick(MUSIC_LINES.named).replace("%t",t).replace("%a",ar);
+ else if(t)line=pick(["《%t》啊，这首我听过。","在放《%t》，好听。","《%t》——记下了。"]).replace("%t",t);
+ else line=pick(MUSIC_LINES.start);
+ showThought(line,"",8200);
+ fx("♪",3);
+ musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;
+ return true;
+}
+function endMusic(reason){
+ if(!musicPose)return;
+ musicPose=false;
+ if(mascot.classList.contains("pose-music")){setPose("");oneShot(img,"pet-land",520)}
+ // 打断（要问话 / 被戳）之后先别急着坐回去，免得来回切姿态
+ musicCooldownUntil=Date.now()+("interrupt"===reason?150000:50000);
+ if("stop"===reason&&Math.random()<.55)setTimeout(()=>{if(canAskNow())showThought(pick(MUSIC_LINES.stop),"",4200)},900);
+}
+async function musicTick(){
+ if(musicProbing)return;
+ musicProbing=true;
+ let r=null;
+ try{r=await invoke({type:"music"})}catch(_){r=null}
+ musicProbing=false;
+ if(!r||!r.ok){
+  // 查询失败（脚本异常等）：听歌姿态不会一直挂着
+  if(musicPose&&Date.now()-musicSeenAt>45000)endMusic("stop");
+  return;
+ }
+ if(r.playing){
+  musicSeenAt=Date.now();
+  if(!musicPose&&canStartMusic())startMusic(r);
+  else if(musicPose&&Date.now()>musicNextLineAt){musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;if(canAskNow())showThought(pick(MUSIC_LINES.long),"",5600)}
+ } else if(musicPose){
+  endMusic("stop");
+ }
+}
+function scheduleMusic(){
+ clearTimeout(musicTimer);musicTimer=0;
+ musicTimer=setTimeout(async()=>{
+  try{if(!document.hidden)await musicTick()}catch(_){}
+  scheduleMusic();
+ },12000);
+}
+
+let curiosityTimer=0,curiousSeq=0,curiosityAt=0;
 function scheduleCuriosity(){
  clearTimeout(curiosityTimer);curiosityTimer=0;
  const L=CURIOUS_LEVELS[curiousLevel]||CURIOUS_LEVELS.normal;
  if(L.off)return;
  const seq=++curiousSeq;
+ curiosityAt=Date.now()+L.scan*1;
  curiosityTimer=setTimeout(async()=>{
   if(seq!==curiousSeq)return;
   try{await curiosityTick()}catch(_){}
@@ -705,7 +826,8 @@ window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy
  wake:()=>wake(true),state:()=>({pose,asleep,held,cls:mascot.className}),
  blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on")),
  curious:()=>curiosityTick(),endCurious:()=>endCurious(),curiousNow:(q)=>{if(!q)return false;startCurious(q);return true},curiousBusy:()=>curiousBusy,
- curiousLevel:()=>curiousLevel,setCuriousLevel:v=>setCuriousLevel(v),curiousTimer:()=>curiosityTimer,
+ curiousLevel:()=>curiousLevel,setCuriousLevel:v=>setCuriousLevel(v),curiousTimer:()=>curiosityTimer,curiousLevels:()=>CURIOUS_LEVELS,curiousNext:()=>curiosityAt,
+ musicOn:()=>musicPose,musicTick:()=>musicTick(),startMusic:i=>startMusic(i),endMusic:r=>endMusic(r||"interrupt"),
  scan:()=>invoke({type:"windows"}),askAbout:(w,m)=>askAbout(w,m),daily:()=>dailyLine(),openReply:()=>openReply(),
  pending:()=>pendingQuestion,chatRef:()=>chatRef,replyError:()=>{const e=document.getElementById("reply-error");return e?e.textContent:""},
  speak:(q,o)=>startCurious(q,o)};
@@ -725,4 +847,5 @@ function loadBounds(tries){
 loadBounds(0);
 scheduleIdle();
 scheduleCuriosity();
+scheduleMusic();
 }();

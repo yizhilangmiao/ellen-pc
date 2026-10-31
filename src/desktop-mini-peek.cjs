@@ -183,7 +183,7 @@ function createPeek({ screen, desktopCapturer, getGateway, getIdle }) {
       // 可以追问的窗口：已经问过「干什么」，隔了一阵还没再聊过
       known: wins.filter(w => {
         const n = notes.get(w.id);
-        return n && n.first > 0 && now - n.last > 18 * 60000;
+        return n && n.first > 0 && now - n.last > 9 * 60000;
       }).map(view)
     };
   }

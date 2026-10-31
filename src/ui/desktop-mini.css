@@ -113,3 +113,32 @@
 #thought.tail-left b{left:18px;right:auto}
 #thought.tail-left.below i{top:-15px;bottom:auto}
 #thought.tail-left.below b{top:-28px;bottom:auto}
+
+/* 右键设置面板：标题栏 + 关闭按钮（面板不参与 #options button 的整行样式） */
+#options .options-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 4px 4px 11px}
+#options .options-head>span{font-size:11px;letter-spacing:.14em;color:#c9afc2}
+#options .panel-close{display:flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;margin:0;border:0;border-radius:50%;background:#f2c2d315;color:#ffdfed;font:20px/1 sans-serif;text-align:center;cursor:pointer}
+#options .panel-close:hover{background:#f2c2d33b}
+
+/* 听歌姿态：坐下戴耳机，跟着节拍轻轻晃 */
+#mascot img.pet-music{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;transition:opacity .32s ease;filter:drop-shadow(0 2px 2px #1b10201f)}
+#mascot.pose-music img.pet-body{opacity:0}
+#mascot.pose-music img.pet-blink{opacity:0!important}
+#mascot.pose-music img.pet-music{opacity:1;animation:pet-music-sway 4.6s ease-in-out infinite}
+@keyframes pet-music-sway{0%,100%{rotate:-1.1deg;translate:0 0}50%{rotate:1.3deg;translate:0 -1.5px}}
+
+/* 设置面板的长内容滚动条：细一点，别抢视线 */
+#options::-webkit-scrollbar{width:6px}
+#options::-webkit-scrollbar-thumb{background:#e7bccb40;border-radius:3px}
+#options::-webkit-scrollbar-track{background:transparent}
+
+/* 让右键设置尽量一屏放下，不用滚 */
+#options{bottom:150px;max-height:calc(100vh - 168px);padding:4px 6px 6px}
+#options button{padding:9px 10px}
+#options .sound-choice{padding:7px 10px;margin:1px 0}
+#options .option-label{margin:7px 10px 4px}
+#options .sound-note{margin:6px 10px;font-size:10.5px;line-height:1.45}
+#options .curiosity-choices{margin:0 7px}
+#options .curiosity-choices button{padding:6px 0}
+#options #option-expand{margin-top:2px}
+#options .options-head{padding:0 4px 2px 10px}
