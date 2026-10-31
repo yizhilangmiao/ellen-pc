@@ -98,9 +98,9 @@ function setPose(name){
 }
 function edgePose(){return"bottom"===pose?"loaf":"left"===pose?"hug-left":"right"===pose?"hug-right":""}
 function poseImg(){return"bottom"===pose?mascot.querySelector(".pet-pose-loaf"):"left"===pose?mascot.querySelector(".hug-left"):"right"===pose?mascot.querySelector(".hug-right"):null}
-/* 趴下去：塌一下身子，同时淡入趴姿 */
+/* 趴下去：塌一下身子，同时淡入趴姿。听歌时保持坐姿，不许趴 */
 function lieDown(lie){
- if(musicPose)endMusic("sleep");
+ if(musicPose)return;
  setPose(lie);
  oneShot(mascot,"pet-flop",540);
 }
@@ -198,6 +198,7 @@ function edgeAtEnd(){
  return"";
 }
 function clearPose(){
+ if(musicPose)endMusic("interrupt");
  img.classList.remove("cling-bottom","cling-left","cling-right","cling-top");
  thought&&thought.classList.remove("thought-top","thought-left","thought-right");
  pose="";setPose(asleep?"sleep":"");
@@ -588,10 +589,38 @@ const MUSIC_LINES={
  long:["这首的尾巴好好听。","循环第几遍了？","我快会唱了。","下一首也该好听吧。","这个鼓点，我尾巴跟着打拍子。","别忘了喝水，也别把音量开太大。"],
  stop:["歌放完了？","耳根子突然安静。","听完了，继续溜达。","摘耳机，回神。"]
 };
+/* 哼歌：短促的拟声，随机飘一句 */
+const MUSIC_HUM=["哼哼～","啦——啦啦～","♪ 嗯嗯……","（跟着小声哼）","哼两句，就两句。","这一段我能哼一整天。","♪～ 啦——","（轻轻打拍子）","别嫌吵，我哼得很小声。","调子对不对……应该是对的。"];
+/* 音乐评价：听一会儿给出的点评 */
+const MUSIC_REVIEW=[
+ "鼓点一进来，这首就不一样了。","副歌比主歌好听，这不算偏心吧。","人声混得有点靠前，不过我吃这套。",
+ "这条贝斯线挺会走。","编曲挺讲究的，不是堆出来的。","和声铺得很厚，听着有点奢侈。","结尾收得干脆，加分。",
+ "前三秒就抓住耳朵了，难得。","旋律一般，是编曲救回来的。","这首适合戴耳机，外放会漏掉细节。","品味可以，这首记下了。",
+ "有点吵，但吵得挺舒服。","这把嗓子的质感不错。","鼓点像踩着心跳。","听完想单曲循环，有点危险。","这个节奏，尾巴自己就打起拍子了。"
+];
+let musicHumTimer=0,musicReviewAt=0;
+function scheduleHum(){
+ clearTimeout(musicHumTimer);musicHumTimer=0;
+ if(!musicPose)return;
+ musicHumTimer=setTimeout(()=>{
+  // 别盖住正在显示的评价/问句
+  if(musicPose&&!panelOpen()&&!curiousBusy&&!(replyBar&&!replyBar.hidden)&&thought&&thought.hidden){
+   showThought(pick(MUSIC_HUM),"",2400+Math.random()*1600);
+   fx("♪",1);
+  }
+  scheduleHum();
+ },15000+Math.random()*20000);
+}
 function canStartMusic(){
  return !musicPose&&!asleep&&!held&&!walking&&!pose&&!curiousBusy&&!panelOpen()&&
   !mascot.classList.contains("pose-curious")&&
   !(replyBar&&!replyBar.hidden)&&Date.now()>musicCooldownUntil;
+}
+// 听歌时 pose 被占着，canAskNow() 会一直返回 false，这里用一条专用判断
+function canSpeakMusic(){
+ return musicPose&&!asleep&&!held&&!walking&&!curiousBusy&&!panelOpen()&&
+  !(replyBar&&!replyBar.hidden)&&
+  !(BUSY.test(img.className||"")||mascot.classList.contains("pet-looking"));
 }
 function startMusic(info){
  if(musicPose)return false;
@@ -600,6 +629,8 @@ function startMusic(info){
  // 文件名/超长标题念出来很奇怪，只保留像歌名的
  const t=(rawT.length>0&&rawT.length<=22&&!/\.(wav|mp3|flac|m4a|ogg|webm|mp4)$/i.test(rawT))?rawT:"";
  musicPose=true;
+ // 用 pose 占住姿态：这样空闲调度不会拉她散步、困了也不会趴下
+ pose="music";
  pendingQuestion="";hideReplyBar();hideReplyButton();
  setPose("music");
  oneShot(mascot,"pet-flop",520);
@@ -610,11 +641,15 @@ function startMusic(info){
  showThought(line,"",8200);
  fx("♪",3);
  musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;
+ musicReviewAt=Date.now()+(70+Math.random()*70)*1000;
+ scheduleHum();
  return true;
 }
 function endMusic(reason){
  if(!musicPose)return;
  musicPose=false;
+ pose="";
+ clearTimeout(musicHumTimer);musicHumTimer=0;
  if(mascot.classList.contains("pose-music")){setPose("");oneShot(img,"pet-land",520)}
  // 打断（要问话 / 被戳）之后先别急着坐回去，免得来回切姿态
  musicCooldownUntil=Date.now()+("interrupt"===reason?150000:50000);
@@ -634,7 +669,15 @@ async function musicTick(){
  if(r.playing){
   musicSeenAt=Date.now();
   if(!musicPose&&canStartMusic())startMusic(r);
-  else if(musicPose&&Date.now()>musicNextLineAt){musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;if(canAskNow())showThought(pick(MUSIC_LINES.long),"",5600)}
+  else if(musicPose&&Date.now()>musicReviewAt){
+   if(canSpeakMusic()){
+    musicReviewAt=Date.now()+(85+Math.random()*75)*1000;
+    showThought(pick(MUSIC_REVIEW),"",5000);
+   } else {
+    musicReviewAt=Date.now()+25000;   // 眼下不方便说，过一会儿再试
+   }
+  }
+  else if(musicPose&&Date.now()>musicNextLineAt){musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;if(canSpeakMusic())showThought(pick(MUSIC_LINES.long),"",5600)}
  } else if(musicPose){
   endMusic("stop");
  }
@@ -742,6 +785,8 @@ function act(kind){
 function scheduleIdle(){clearTimeout(idleTimer);idleTimer=setTimeout(idleTick,7000+Math.random()*11000)}
 function idleTick(){
  if(held||asleep||walking||panelOpen())return scheduleIdle();
+ // 听歌时她就坐在那儿，不溜达、不做小动作
+ if(musicPose)return scheduleIdle();
  // 她正在问话/等回复：别让发呆小动作把这一幕打断
  if(curiousBusy||(replyBar&&!replyBar.hidden))return scheduleIdle();
  if(pose){if(Math.random()<.22)fx("♪",2);else if(Math.random()<.08)showThought(pick(LINES.ambient));return scheduleIdle()}
@@ -801,12 +846,12 @@ scheduleBlink();
 
 /* ---- 活跃度 / 睡觉（无聊了就趴下睡）---- */
 function bump(){lastActive=Date.now();if(asleep)wake(false)}
-function wake(startle){clearTimeout(restTimer);asleep=false;img.classList.remove("doze");zzz.classList.remove("show");blinkImg&&blinkImg.classList.remove("on");setPose(edgePose());
+function wake(startle){clearTimeout(restTimer);asleep=false;img.classList.remove("doze");zzz.classList.remove("show");blinkImg&&blinkImg.classList.remove("on");setPose(musicPose?"music":edgePose());
  if(startle)oneShot(img,"pet-startle",500)}
 document.addEventListener("pointerdown",bump,true);
 document.addEventListener("keydown",bump,true);
 setInterval(()=>{
- if(held||asleep||walking||panelOpen())return;
+ if(held||asleep||walking||panelOpen()||musicPose)return;
  if(Date.now()-lastActive>1e5){
   asleep=true;
   if(!pose){lieDown("sleep");if(Math.random()<.6)showThought(pick(LINES.sleepy))}
@@ -815,19 +860,21 @@ setInterval(()=>{
 },4000);
 
 /* ---- 窗口尺寸变化时退出趴姿 ---- */
-window.addEventListener("resize",()=>{if(pose){clearPose();cancelGlide()}});
+window.addEventListener("resize",()=>{if(musicPose)endMusic("stop");if(pose){clearPose();cancelGlide()}});
 
 /* ---- 调试钩子（自动化验证用）---- */
 window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy],edge:()=>edgeAtEnd(),box:()=>screenBox(),sim:(w,c)=>{drag0=w;lastPtr=c},
  moveTo,wander:(d)=>wander(d|0),wa:()=>wa,pos:()=>readPos(),reloadBounds:()=>loadBounds(9),act,look,stopWalk,
  flip:()=>isFlip(),setFlip:(v)=>setFlip(v),walking:()=>walking,moves:()=>moveLog.slice(),
  lie:n=>{setPose(n)},
- sleepNow:()=>{asleep=true;if(!pose)lieDown("sleep");placeZzz();zzz.classList.add("show")},
+ sleepNow:()=>{if(musicPose)return;asleep=true;if(!pose)lieDown("sleep");placeZzz();zzz.classList.add("show")},
+ reviewNow:()=>{musicReviewAt=0;return musicTick()},
  wake:()=>wake(true),state:()=>({pose,asleep,held,cls:mascot.className}),
  blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on")),
  curious:()=>curiosityTick(),endCurious:()=>endCurious(),curiousNow:(q)=>{if(!q)return false;startCurious(q);return true},curiousBusy:()=>curiousBusy,
  curiousLevel:()=>curiousLevel,setCuriousLevel:v=>setCuriousLevel(v),curiousTimer:()=>curiosityTimer,curiousLevels:()=>CURIOUS_LEVELS,curiousNext:()=>curiosityAt,
  musicOn:()=>musicPose,musicTick:()=>musicTick(),startMusic:i=>startMusic(i),endMusic:r=>endMusic(r||"interrupt"),
+ musicHum:()=>scheduleHum(),musicReviewAt:()=>musicReviewAt,musicSpeakable:()=>canSpeakMusic(),
  scan:()=>invoke({type:"windows"}),askAbout:(w,m)=>askAbout(w,m),daily:()=>dailyLine(),openReply:()=>openReply(),
  pending:()=>pendingQuestion,chatRef:()=>chatRef,replyError:()=>{const e=document.getElementById("reply-error");return e?e.textContent:""},
  speak:(q,o)=>startCurious(q,o)};

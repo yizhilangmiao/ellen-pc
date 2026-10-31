@@ -15,12 +15,27 @@ function Emit($o) {
 }
 
 # 这些播放器不上报 SMTC，只能用音频会话兜底（进程名小写）
+# 认识的播放器（进程名小写）：命中就直接算在放音乐
 $PLAYERS = @(
+  # 国内
   "cloudmusic", "qqmusic", "kugou", "kwmusic", "kuwo", "kwplayer",
-  "spotify", "applemusic", "tidal", "deezer", "strawberry", "clementine",
-  "foobar2000", "musicbee", "aimp", "aimp64", "vlc", "wmplayer",
-  "mpc-hc", "mpc-hc64", "potplayer", "potplayermini", "potplayermini64",
-  "lx-music-desktop", "yesplaymusic", "splayer"
+  "migumusic", "sodamusic", "bilibili", "lx-music-desktop", "yesplaymusic",
+  "splayer", "musicfree", "saltplayer", "foobox",
+  # 国外
+  "spotify", "applemusic", "tidal", "deezer", "qobuz", "amazon music",
+  "youtubemusic", "strawberry", "clementine", "rhythmbox",
+  # 本地播放器 / 视频播放器（放视频时坐下听也说得过去）
+  "foobar2000", "musicbee", "aimp", "aimp64", "winamp", "mediamonkey", "jriver",
+  "vlc", "wmplayer", "mpc-hc", "mpc-hc64", "mpc-be", "mpc-be64", "mpv", "mpvnet",
+  "potplayer", "potplayermini", "potplayermini64", "kmplayer", "gomplayer"
+)
+# 有声音但不是「在听歌」的东西：自己的语音、壁纸引擎、浏览器（走 SMTC）、通话软件
+$BLOCK = @(
+  "ellen", "wallpaper64", "wallpaper32", "audiodg",
+  "chrome", "msedge", "firefox", "brave", "opera", "vivaldi",
+  "360se", "360chrome", "qqbrowser", "sogouexplorer",
+  "weixin", "wechat", "qq", "tim", "dingtalk", "feishu", "wemeet",
+  "zoom", "teams", "ms-teams", "discord", "skype", "kook", "yy", "obs64", "obs32"
 )
 # 窗口标题里的这些不是歌名
 $TITLE_SKIP = @("桌面歌词", "网易云音乐", "QQ音乐", "酷狗音乐", "酷我音乐", "Spotify", "Spotify Premium")
@@ -271,18 +286,21 @@ try {
   Emit @{ ok = $false; playing = $false; reason = "audio-fail:" + $_.Exception.Message }
 }
 
+# 认识的播放器优先；不认识的先记下来，等看完窗口标题再决定
 $hit = $null
+$unknown = $null
 foreach ($s in $sessions) {
   if ($s.State -ne 1) { continue }        # 1 = Active
   if ($s.Peak -lt 0.0008) { continue }    # 有输出才算是真的在放
   $name = ""
   try { $name = (Get-Process -Id $s.Pid -ErrorAction Stop).ProcessName.ToLower() } catch { continue }
-  if ($PLAYERS -notcontains $name) { continue }
-  $hit = @{ pid = $s.Pid; name = $name; peak = $s.Peak }
-  break
+  if ($BLOCK -contains $name) { continue }
+  if ($PLAYERS -contains $name) { $hit = @{ pid = $s.Pid; name = $name; peak = $s.Peak }; break }
+  if (-not $unknown) { $unknown = @{ pid = $s.Pid; name = $name; peak = $s.Peak } }
 }
 
-if (-not $hit) {
+$cand = if ($hit) { $hit } else { $unknown }
+if (-not $cand) {
   if ($smtc) { Emit $smtc }
   Emit @{ ok = $true; playing = $false; status = "None"; title = ""; artist = ""; app = ""; source = "audio" }
 }
@@ -292,7 +310,7 @@ $title = ""; $artist = ""
 try {
   $pids = @()
   foreach ($p in Get-Process -ErrorAction SilentlyContinue) {
-    if ($p.ProcessName.ToLower() -eq $hit.name) { $pids += $p.Id }
+    if ($p.ProcessName.ToLower() -eq $cand.name) { $pids += $p.Id }
   }
   $best = ""; $bestScore = -1
   foreach ($w in [WinScan]::Titles()) {
@@ -322,7 +340,16 @@ try {
   }
 } catch { }
 
+# 不认识的进程：只有窗口标题长得像「歌名 - 歌手」才认，免得把游戏、提示音当成听歌
+if (-not $hit) {
+  $looksSong = $title -and $artist -and $artist.Length -le 24 -and $title.Length -le 42
+  if (-not $looksSong) {
+    if ($smtc) { Emit $smtc }
+    Emit @{ ok = $true; playing = $false; status = "None"; title = ""; artist = ""; app = ""; source = "audio" }
+  }
+}
+
 Emit @{
   ok = $true; playing = $true; status = "Playing"
-  title = $title; artist = $artist; app = $hit.name; peak = [math]::Round($hit.peak, 3); source = "audio"
+  title = $title; artist = $artist; app = $cand.name; peak = [math]::Round($cand.peak, 3); source = "audio"
 }
