@@ -184,9 +184,27 @@ function screenBox(){
  return{left:ax,top:ay,right:ax+sw,bottom:ay+sh,waLeft:ax,waTop:ay,waRight:ax+aw,waBottom:ay+ah};
 }
 /* 拖动起点：窗口位置 + 光标位置（用于计算「顶住后再多拖了几像素」） */
-let drag0=null,lastPtr=null;
-document.addEventListener("pointermove",e=>{lastPtr={x:e.screenX,y:e.screenY}},true);
-document.addEventListener("pointerup",e=>{lastPtr={x:e.screenX,y:e.screenY}},true);
+let drag0=null,lastPtr=null,ptrTrail=[];
+function trailSample(){
+ ptrTrail.push({t:performance.now(),x:lastPtr?lastPtr.x:0,y:lastPtr?lastPtr.y:0});
+ if(ptrTrail.length>26)ptrTrail.shift();
+}
+/* 松手瞬间的甩动速度：取最近 ~110ms 的指针轨迹差分 */
+function releaseVel(){
+ const now=performance.now();
+ let a=null,b2=null;
+ for(let i=ptrTrail.length-1;i>=0;i--){
+  if(now-ptrTrail[i].t>110)break;
+  if(!b2)b2=ptrTrail[i];
+  a=ptrTrail[i];
+ }
+ if(!a||!b2||b2===a)return null;
+ const dt=(b2.t-a.t)/1000;
+ if(dt<.016)return null;
+ return{x:(b2.x-a.x)/dt,y:(b2.y-a.y)/dt};
+}
+document.addEventListener("pointermove",e=>{lastPtr={x:e.screenX,y:e.screenY};if(held)trailSample()},true);
+document.addEventListener("pointerup",e=>{lastPtr={x:e.screenX,y:e.screenY};if(held)trailSample()},true);
 /* 小人在屏幕上的实际位置（窗口铺满工作区后，窗口坐标恒为 0，必须以她本人为准） */
 function mascotBox(){const r=mascot.getBoundingClientRect();return{l:window.screenX+r.left,t:window.screenY+r.top,s:r.width}}
 function edgeAtEnd(){
@@ -285,10 +303,66 @@ mascot.addEventListener("pointermove",e=>{bump();if(pose||mascot.classList.conta
  // 光标正好压在她中线附近时不跟着抖，避免手抖带出细碎的左右晃
  root.style.setProperty("--pet-lean",(Math.abs(rel)<.14?0:clamp(rel*5,-6,6)).toFixed(1)+"deg")});
 
+/* ---- 扔出去会飞：重力 + 落地弹跳（仿大肥鱼），只有甩得够快才触发 ----
+   复用 walking 标志占住调度：飞行期间闲逛/犯困/听歌/提问全部自然让路，
+   现有逻辑一行不改。位置由主进程新分支 "fly" 逐帧落窗。 ---- */
+let flyRaf=0,flySeq=0;
+function cancelFly(){if(flyRaf){cancelAnimationFrame(flyRaf);flyRaf=0}flySeq++}
+function endFly(hard){
+ if(flyRaf){cancelAnimationFrame(flyRaf);flyRaf=0}
+ flySeq++;
+ walking=false;img.classList.remove("walking");
+ root.style.setProperty("--pet-lean","0deg");
+ try{invoke({type:"fly-end"})}catch(_){}
+ if(hard){oneShot(img,"pet-dizzy",1300);
+  if(Math.random()<.6)showThought(pick(["呜……你轻点放。","头好晕……","下次不许扔这么用力。"]),"")}
+ lastActive=Date.now();scheduleIdle();
+}
+function startFly(vx,vy){
+ cancelFly();
+ const lim=playBounds();
+ let px=readPos().x,py=readPos().y;
+ pos.x=px;pos.y=py;
+ const G=1560,REST=.62,seq=++flySeq;
+ walking=true;img.classList.remove("walking");img.classList.remove("held");
+ setFlip(vx<0);
+ let bounces=0;
+ if(Math.random()<.35)showThought(pick(["哇啊——！","放我下来——！","呜哇！！"]),"");
+ const t0=performance.now();
+ let lastT=t0;
+ const step=t=>{
+  if(seq!==flySeq)return;
+  const dt=Math.min(.032,(t-lastT)/1000)||.016;lastT=t;
+  vy+=G*dt;
+  px+=vx*dt;py+=vy*dt;
+  let hit=false;
+  if(px<lim.minX){px=lim.minX;vx=Math.abs(vx)*REST;hit=true}
+  else if(px>lim.maxX){px=lim.maxX;vx=-Math.abs(vx)*REST;hit=true}
+  if(py<lim.minY){py=lim.minY;vy=Math.abs(vy)*REST;hit=true}
+  if(py>=lim.maxY){
+   py=lim.maxY;
+   if(vy>90){vy=-vy*REST;vx*=.8;hit=true;bounces++}
+   else{vy=0;vx*=.9}
+  }
+  if(hit&&bounces===1)oneShot(img,"pet-land",520);
+  if(Math.abs(vx)>140)setFlip(vx<0);
+  root.style.setProperty("--pet-lean",clamp(vx*.012,-12,12).toFixed(1)+"deg");
+  try{invoke({type:"fly",x:Math.round(px),y:Math.round(py)})}catch(_){}
+  if(py>=lim.maxY-.5&&Math.abs(vy)<24&&Math.abs(vx)<22){endFly(bounces>=2);return}
+  if(t-t0>6000){endFly(false);return}
+  flyRaf=requestAnimationFrame(step);
+ };
+ flyRaf=requestAnimationFrame(step);
+}
+function canFly(){
+ try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return false}catch(_){}
+ return !document.body.classList.contains("reduce-ui-motion");
+}
+
 /* ---- 被拎起来：取消姿态、归位、晃悠；放下：贴边判定 or 落地弹 ---- */
 new MutationObserver(()=>{
  const d=mascot.classList.contains("dragging");
- if(d&&!held){held=true;cancelGlide();walking=false;img.classList.remove("walking");
+ if(d&&!held){held=true;cancelGlide();cancelFly();walking=false;img.classList.remove("walking");
   stopWalk();
   const mb=mascotBox();drag0={mx:mb.l,my:mb.t,px:lastPtr?lastPtr.x:null,py:lastPtr?lastPtr.y:null};
   if(mascot.classList.contains("pose-curious"))endCurious();
@@ -296,10 +370,14 @@ new MutationObserver(()=>{
   clearPose();img.classList.add("held");if(asleep)wake(false);
   lookSeq++;mascot.classList.remove("pet-looking");root.style.setProperty("--pet-lean","0deg")}
  if(!d&&held){held=false;img.classList.remove("held");
+  const vel=releaseVel();ptrTrail.length=0;
   setTimeout(()=>{if(held||panelOpen())return;
    const edge=edgeAtEnd();
    drag0=null;
    if(edge)enterCling(edge);
+   else if(vel&&canFly()&&!asleep&&Math.hypot(vel.x,vel.y)>620){
+    startFly(clamp(vel.x*.92,-2600,2600),clamp(vel.y*.92,-2600,2600));
+   }
    else{const p=readPos();pos.x=p.x;pos.y=p.y;clearPose();oneShot(img,"pet-land",600);scheduleIdle()}
   },150);
   lastActive=Date.now()}
@@ -1012,6 +1090,7 @@ window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy
  sleepNow:()=>{if(musicPose)return;asleep=true;if(!pose)lieDown("sleep");placeZzz();zzz.classList.add("show")},
  reviewNow:()=>{musicReviewAt=0;return musicTick()},
  wake:()=>wake(true),state:()=>({pose,asleep,held,cls:mascot.className}),
+ fly:(a,b)=>startFly(a,b),flying:()=>!!flyRaf,cancelFly:()=>cancelFly(),
  blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on")),
  curious:()=>curiosityTick(),endCurious:()=>endCurious(),curiousNow:(q)=>{if(!q)return false;startCurious(q);return true},curiousBusy:()=>curiousBusy,
  curiousLevel:()=>curiousLevel,setCuriousLevel:v=>setCuriousLevel(v),curiousTimer:()=>curiosityTimer,curiousLevels:()=>CURIOUS_LEVELS,curiousNext:()=>curiosityAt,
