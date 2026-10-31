@@ -5,14 +5,11 @@
 #   1) 系统媒体接口 SMTC —— Edge / Chrome / Spotify / Apple Music 这类守规矩的播放器走这里，能直接拿到歌名
 #   2) 音频会话 Core Audio + 窗口标题 —— 网易云、QQ音乐等不向 SMTC 上报，只能看「它到底有没有在出声」，
 #      歌名再从播放器窗口标题（网易云会写成「歌名 - 歌手」）里取
-param([int]$TimeoutMs = 1800)
+param([switch]$Watch, [int]$ParentPid = 0, [int]$TimeoutMs = 1800)
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-function Emit($o) {
-  $o | ConvertTo-Json -Compress -Depth 3
-  exit 0
-}
+
 
 # 这些播放器不上报 SMTC，只能用音频会话兜底（进程名小写）
 # 认识的播放器（进程名小写）：命中就直接算在放音乐
@@ -40,6 +37,7 @@ $BLOCK = @(
 # 窗口标题里的这些不是歌名
 $TITLE_SKIP = @("桌面歌词", "网易云音乐", "QQ音乐", "酷狗音乐", "酷我音乐", "Spotify", "Spotify Premium")
 
+function Get-NowPlaying {
 # ---------- 1) SMTC ----------
 $smtc = $null
 try {
@@ -78,7 +76,7 @@ try {
   }
 } catch { }
 
-if ($smtc -and $smtc.playing) { Emit $smtc }
+if ($smtc -and $smtc.playing) { return $smtc }
 
 # ---------- 2) Core Audio + 窗口标题 ----------
 $src = @'
@@ -256,6 +254,7 @@ public static class WinScan {
 '@
 
 # 编译一次就缓存成 dll，之后每 12 秒轮询时直接加载（约 0.2s 而不是 1.5s）
+if (-not ("AudioPeek" -as [type])) {
 $cacheDir = Join-Path $env:TEMP "ellen-audio"
 $dll = Join-Path $cacheDir "audio-peek-1.1.dll"
 $loaded = $false
@@ -277,13 +276,14 @@ if (-not ("AudioPeek" -as [type])) {
   # -OutputAssembly 只产出 dll、不把类型带进会话，那就显式加载一次
   try { Add-Type -Path $dll -ErrorAction Stop; $loaded = $true } catch { $errs += "reload:" + $_.Exception.Message }
 }
-if (-not $loaded) { Emit @{ ok = $false; playing = $false; reason = ("no-coreaudio " + ($errs -join " | ")) } }
-if (-not ("AudioPeek" -as [type])) { Emit @{ ok = $false; playing = $false; reason = ("type-missing " + ($errs -join " | ")) } }
+if (-not $loaded) { return @{ ok = $false; playing = $false; reason = ("no-coreaudio " + ($errs -join " | ")) } }
+if (-not ("AudioPeek" -as [type])) { return @{ ok = $false; playing = $false; reason = ("type-missing " + ($errs -join " | ")) } }
+}
 
 try {
   $sessions = [AudioPeek]::List()
 } catch {
-  Emit @{ ok = $false; playing = $false; reason = "audio-fail:" + $_.Exception.Message }
+  return @{ ok = $false; playing = $false; reason = "audio-fail:" + $_.Exception.Message }
 }
 
 # 认识的播放器优先；不认识的先记下来，等看完窗口标题再决定
@@ -301,8 +301,8 @@ foreach ($s in $sessions) {
 
 $cand = if ($hit) { $hit } else { $unknown }
 if (-not $cand) {
-  if ($smtc) { Emit $smtc }
-  Emit @{ ok = $true; playing = $false; status = "None"; title = ""; artist = ""; app = ""; source = "audio" }
+  if ($smtc) { return $smtc }
+  return @{ ok = $true; playing = $false; status = "None"; title = ""; artist = ""; app = ""; source = "audio" }
 }
 
 # 从播放器窗口标题里取歌名：网易云会写成「歌名 - 歌手」
@@ -344,12 +344,35 @@ try {
 if (-not $hit) {
   $looksSong = $title -and $artist -and $artist.Length -le 24 -and $title.Length -le 42
   if (-not $looksSong) {
-    if ($smtc) { Emit $smtc }
-    Emit @{ ok = $true; playing = $false; status = "None"; title = ""; artist = ""; app = ""; source = "audio" }
+    if ($smtc) { return $smtc }
+    return @{ ok = $true; playing = $false; status = "None"; title = ""; artist = ""; app = ""; source = "audio" }
   }
 }
 
-Emit @{
+return @{
   ok = $true; playing = $true; status = "Playing"
   title = $title; artist = $artist; app = $cand.name; peak = [math]::Round($cand.peak, 3); source = "audio"
+}
+}
+
+function Write-One($o) { $o | ConvertTo-Json -Compress -Depth 3 }
+
+if ($Watch) {
+  # 常驻模式：每行一个 JSON，Node 侧按行解析；进程被关掉就自然结束
+  $ticks = 0
+  while ($true) {
+    $o = $null
+    try { $o = Get-NowPlaying } catch { $o = @{ ok = $false; playing = $false; reason = ("watch:" + $_.Exception.Message) } }
+    if (-not $o) { $o = @{ ok = $false; playing = $false } }
+    try { [Console]::Out.WriteLine((Write-One $o)); [Console]::Out.Flush() }
+    catch { break }   # 父进程没了、管道断了就退出，别在后台空转
+    $ticks++
+    # Electron 被强杀时管道不一定立刻报错，隔 10 秒确认一次父进程还在不在
+    if ($ParentPid -gt 0 -and ($ticks % 10) -eq 0) {
+      if (-not (Get-Process -Id $ParentPid -ErrorAction SilentlyContinue)) { break }
+    }
+    Start-Sleep -Milliseconds 1000
+  }
+} else {
+  Write-One (Get-NowPlaying)
 }

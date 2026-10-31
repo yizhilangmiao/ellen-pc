@@ -731,7 +731,7 @@ function scheduleMusic(){
  musicTimer=setTimeout(async()=>{
   try{if(!document.hidden)await musicTick()}catch(_){}
   scheduleMusic();
- },12000);
+ },3000);
 }
 
 let curiosityTimer=0,curiousSeq=0,curiosityAt=0;

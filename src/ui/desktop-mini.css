@@ -56,8 +56,8 @@
 #thought.thought-left{left:calc(100% - 6px + var(--pet-dx,0px));right:auto;translate:none}
 #thought.thought-right{right:calc(26px - var(--pet-dx,0px));translate:none}
 /* ===== 趴下 / 趴着睡觉：真人立绘姿态层（与站姿交叉淡入淡出） ===== */
-#mascot img.pet-body{opacity:1;transition:opacity .3s ease,rotate .22s ease-out}
-#mascot img.pet-pose{position:absolute;left:50%;bottom:0;width:106%;height:auto;translate:-50% 0;rotate:0deg;scale:1;opacity:0;pointer-events:none;transform-origin:50% 100%;transition:opacity .4s ease;animation:none;filter:drop-shadow(0 2px 2px #1b10201f);will-change:opacity}
+#mascot img.pet-body{opacity:1;transition:opacity .22s ease,rotate .22s ease-out}
+#mascot img.pet-pose{position:absolute;left:50%;bottom:0;width:106%;height:auto;translate:-50% 0;rotate:0deg;scale:1;opacity:0;pointer-events:none;transform-origin:50% 100%;transition:opacity .26s ease;animation:none;filter:drop-shadow(0 2px 2px #1b10201f);will-change:opacity}
 #mascot.pose-loaf img.pet-body,#mascot.pose-sleep img.pet-body{opacity:0}
 #mascot.pose-loaf img.pet-pose-loaf{opacity:1;animation:pose-loaf-breathe 5.2s ease-in-out infinite}
 #mascot.pose-sleep img.pet-pose-sleep{opacity:1;animation:pose-sleep-breathe 4.6s ease-in-out infinite}
@@ -65,17 +65,17 @@
 @keyframes pose-sleep-breathe{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.016,.972) translateY(-1px)}}
 #mascot img.pet-pose.pet-nudge{animation:pet-nudge .56s cubic-bezier(.3,1.4,.6,1)}
 @keyframes pet-nudge{0%{transform:none}30%{transform:translateY(-5px) scale(1.035,.955)}65%{transform:translateY(0) scale(.99,1.012)}100%{transform:none}}
-#mascot .pet-ground{position:absolute;left:50%;bottom:1px;width:62%;height:10px;translate:-50% 0;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,#160c1f38,#160c1f00 72%);opacity:0;transition:opacity .4s ease;pointer-events:none}
+#mascot .pet-ground{position:absolute;left:50%;bottom:1px;width:62%;height:10px;translate:-50% 0;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,#160c1f38,#160c1f00 72%);opacity:0;transition:opacity .26s ease;pointer-events:none}
 #mascot.pose-loaf .pet-ground,#mascot.pose-sleep .pet-ground{opacity:1}
 #mascot.pet-flop{animation:pet-flop .5s cubic-bezier(.3,1.2,.6,1)}
 @keyframes pet-flop{0%{transform:scale(1)}32%{transform:scale(1.07,.84) translateY(6px)}62%{transform:scale(.97,1.04) translateY(-2px)}100%{transform:none}}
 /* ===== 抱住左右屏幕边缘：独立立绘姿态层（替换原来的 90° 旋转贴墙） ===== */
-#mascot img.pet-pose-edge{position:absolute;bottom:0;height:120%;width:auto;rotate:0deg;scale:1;opacity:0;pointer-events:none;transform-origin:50% 100%;transition:opacity .38s ease;animation:none;filter:drop-shadow(0 3px 5px #1a10202b);will-change:opacity}
+#mascot img.pet-pose-edge{position:absolute;bottom:0;height:120%;width:auto;rotate:0deg;scale:1;opacity:0;pointer-events:none;transform-origin:50% 100%;transition:opacity .24s ease;animation:none;filter:drop-shadow(0 3px 5px #1a10202b);will-change:opacity}
 #mascot img.pet-pose-edge.hug-left{left:0;transform-origin:0 100%}
 #mascot img.pet-pose-edge.hug-right{right:0;transform-origin:100% 100%}
 #mascot.pose-hug-left img.pet-body,#mascot.pose-hug-right img.pet-body{opacity:0}
 /* 好奇姿态：疑问立绘叠层，切换时与站姿交叉淡入 */
-#mascot img.pet-curious{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;transition:opacity .28s ease;filter:drop-shadow(0 2px 2px #1b10201f)}
+#mascot img.pet-curious{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;transition:opacity .2s ease;filter:drop-shadow(0 2px 2px #1b10201f)}
 #mascot.pose-curious img.pet-body{opacity:0}
 #mascot.pose-curious img.pet-blink{opacity:0!important}
 #mascot.pose-curious img.pet-curious{opacity:1;animation:pet-curious-tilt 3.8s ease-in-out infinite}
@@ -121,7 +121,7 @@
 #options .panel-close:hover{background:#f2c2d33b}
 
 /* 听歌姿态：坐下戴耳机，跟着节拍轻轻晃 */
-#mascot img.pet-music{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;transition:opacity .32s ease;filter:drop-shadow(0 2px 2px #1b10201f)}
+#mascot img.pet-music{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;transition:opacity .22s ease;filter:drop-shadow(0 2px 2px #1b10201f)}
 #mascot.pose-music img.pet-body{opacity:0}
 #mascot.pose-music img.pet-blink{opacity:0!important}
 #mascot.pose-music img.pet-music{opacity:1;animation:pet-music-sway 4.6s ease-in-out infinite}
