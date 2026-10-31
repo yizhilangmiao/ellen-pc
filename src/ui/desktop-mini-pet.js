@@ -589,6 +589,16 @@ const MUSIC_LINES={
  long:["这首的尾巴好好听。","循环第几遍了？","我快会唱了。","下一首也该好听吧。","这个鼓点，我尾巴跟着打拍子。","别忘了喝水，也别把音量开太大。"],
  stop:["歌放完了？","耳根子突然安静。","听完了，继续溜达。","摘耳机，回神。"]
 };
+/* 换歌：她得察觉出来，说一句 */
+const MUSIC_SWITCH={
+ named:["换到《%t》了。","诶，切歌了，《%t》。","这首是《%t》，听着。","《%t》——换口味了？","哦，《%t》，这首我有印象。"],
+ plain:["换歌了？","诶，这首不一样。","切歌了，前奏挺抓人。","新的一首，我没听过。","换风格了？","嗯？换了。","这首开头就不一样。","换曲子也不打声招呼。"]
+};
+let musicTrack="",musicSwitchAt=0;
+function trackKey(info){
+ const t=String(info&&info.title||"").trim(),a=String(info&&info.artist||"").trim();
+ return t?t+"|"+a:"";
+}
 /* 哼歌：哼一段旋律，不是两个字的「哼哼」 */
 const MUSIC_HUM=[
  "哼〰哼哼〰哼〰〰","嗯～嗯嗯〰嗯〰～","啦〰啦啦～啦〰〰","哼嗯～哼嗯〰哼～",
@@ -647,6 +657,7 @@ function startMusic(info){
  fx("♪",3);
  musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;
  musicReviewAt=Date.now()+(70+Math.random()*70)*1000;
+ musicTrack=trackKey(info);
  scheduleHum();
  return true;
 }
@@ -673,7 +684,20 @@ async function musicTick(){
  }
  if(r.playing){
   musicSeenAt=Date.now();
+  const key=trackKey(r);
   if(!musicPose&&canStartMusic())startMusic(r);
+  else if(musicPose&&key&&key!==musicTrack&&Date.now()-musicSwitchAt>15000){
+   // 换歌了：念新歌名，并把评价/闲聊的计时重排，别一换歌就点评
+   musicTrack=key;musicSwitchAt=Date.now();
+   musicReviewAt=Date.now()+(85+Math.random()*75)*1000;
+   musicNextLineAt=Date.now()+(9+Math.random()*7)*60000;
+   if(canSpeakMusic()&&thought&&thought.hidden){
+    const t=String(r.title||"").trim(),ar=String(r.artist||"").trim().slice(0,16);
+    const useName=t&&t.length<=22&&!/\.(wav|mp3|flac|m4a|ogg|webm|mp4)$/i.test(t);
+    showThought(useName?pick(MUSIC_SWITCH.named).replace("%t",t).replace("%a",ar):pick(MUSIC_SWITCH.plain),"",4400);
+    fx("♪",2);
+   }
+  }
   else if(musicPose&&Date.now()>musicReviewAt){
    if(canSpeakMusic()){
     musicReviewAt=Date.now()+(85+Math.random()*75)*1000;
@@ -880,6 +904,7 @@ window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy
  curiousLevel:()=>curiousLevel,setCuriousLevel:v=>setCuriousLevel(v),curiousTimer:()=>curiosityTimer,curiousLevels:()=>CURIOUS_LEVELS,curiousNext:()=>curiosityAt,
  musicOn:()=>musicPose,musicTick:()=>musicTick(),startMusic:i=>startMusic(i),endMusic:r=>endMusic(r||"interrupt"),
  musicHum:()=>scheduleHum(),musicReviewAt:()=>musicReviewAt,musicSpeakable:()=>canSpeakMusic(),
+ musicTrack:()=>musicTrack,setMusicTrack:v=>{musicTrack=String(v||"")},
  scan:()=>invoke({type:"windows"}),askAbout:(w,m)=>askAbout(w,m),daily:()=>dailyLine(),openReply:()=>openReply(),
  pending:()=>pendingQuestion,chatRef:()=>chatRef,replyError:()=>{const e=document.getElementById("reply-error");return e?e.textContent:""},
  speak:(q,o)=>startCurious(q,o)};
