@@ -126,6 +126,8 @@ function showThought(text,mode,holdMs){
  else if("right"===mode)thought.classList.add("thought-right");
  thought.hidden=false;
  try{thought.animate([{opacity:0,transform:"translateY(8px) scale(.9)"},{opacity:1,transform:"translateY(0) scale(1)"}],{duration:210,easing:"ease-out"})}catch(_){}
+ // 刚显示时按当前文字长度和窗口位置重排一次：否则气泡会用上一次的旧坐标，贴屏幕边就会露到屏幕外
+ try{window.__miniReflow&&window.__miniReflow()}catch(_){}
  clearTimeout(lineTimer);
  lineTimer=setTimeout(()=>{thought.hidden=true;thought.classList.remove("thought-top","thought-left","thought-right","below")},holdMs||3800);
 }
@@ -367,12 +369,21 @@ function ensureReplyButton(){
   b.addEventListener("click",e=>{e.stopPropagation();openReply()});
   thought.appendChild(b);
  }
+ b.hidden=false;
  return b;
+}
+/* 只有真的有待回的问题时才留按钮：以前这个按钮建好就赖在气泡里，
+   之后任何一句台词（犯困、闲聊、点击）都会带着它，点了却因为
+   pendingQuestion 已清空而毫无反应 —— 就是「趴下睡觉时点了没反应」。 */
+function hideReplyButton(){
+ const b=document.getElementById("thought-reply");
+ if(b)b.remove();
 }
 function hideReplyBar(){if(replyBar)replyBar.hidden=true}
 function endCurious(){
  clearTimeout(curiousHold);curiousHold=0;
  hideReplyBar();
+ hideReplyButton();
  if(mascot.classList.contains("pose-curious")){setPose("");oneShot(img,"pet-land",520)}
  curiousBusy=false;pendingQuestion="";lastActive=Date.now();scheduleIdle();
 }
@@ -388,8 +399,13 @@ function startCurious(text,opts){
 }
 function openReply(){
  if(!replyBar||!pendingQuestion)return;
- // 聊天/通话/设置面板开着就别再插一条：会和面板叠在一起
- if(panelOpen())return;
+ // 睡着也照样能回：先把人叫醒，不然她还在打呼，回复条像被吞了
+ if(asleep)wake(false);
+ // 面板开着：先收起面板（不然回复条被面板盖住），再把刚才那句问话摆回来
+ if(panelOpen()){
+  document.querySelectorAll(".panel-close").forEach(b=>b.click());
+  if(pendingQuestion)showThought(pendingQuestion,"",90000);
+ }
  replyBar.hidden=false;
  if(replyInput){replyInput.value="";try{replyInput.focus()}catch(_){}}
  ensureReplyButton();
@@ -420,6 +436,7 @@ async function sendReply(){
   await invoke({type:"send",text:composed,threadId:chatRef.threadId,libraryId:chatRef.libraryId});
   if(replyInput)replyInput.value="";
   hideReplyBar();
+  hideReplyButton();
   pendingQuestion="";
   showThought("嗯，我记着了。","",3600);
   clearTimeout(curiousHold);
