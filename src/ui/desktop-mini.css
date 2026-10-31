@@ -11,6 +11,9 @@
 #tools,#thought,#call-badge{translate:var(--pet-dx,0px) var(--pet-dy,0px)}
 #mascot img{rotate:var(--pet-lean,0deg);scale:var(--pet-flip,1) 1;transition:rotate .22s ease-out;animation:pet-breathe 3.6s ease-in-out infinite alternate}
 #mascot img.flip{--pet-flip:-1}
+/* 站姿与眨眼是两张整图叠在一起：镜像变量必须同时作用于两层，
+   否则朝左时一眨眼，眨眼帧会以「未镜像」的原图盖上 60~110ms，看起来就是原地抽一下 */
+#mascot.flip img.pet-body,#mascot.flip img.pet-blink{--pet-flip:-1}
 #mascot.pet-looking img.pet-body{transition:opacity .3s ease,rotate .7s cubic-bezier(.4,0,.3,1)}
 @keyframes pet-breathe{from{translate:0 0}to{translate:0 -3px}}
 #mascot img.walking{--pet-lean:0deg;animation:pet-waddle var(--waddle-ms,.6s) ease-in-out infinite}
@@ -71,6 +74,12 @@
 #mascot img.pet-pose-edge.hug-left{left:0;transform-origin:0 100%}
 #mascot img.pet-pose-edge.hug-right{right:0;transform-origin:100% 100%}
 #mascot.pose-hug-left img.pet-body,#mascot.pose-hug-right img.pet-body{opacity:0}
+/* 好奇姿态：疑问立绘叠层，切换时与站姿交叉淡入 */
+#mascot img.pet-curious{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;pointer-events:none;transition:opacity .28s ease;filter:drop-shadow(0 2px 2px #1b10201f)}
+#mascot.pose-curious img.pet-body{opacity:0}
+#mascot.pose-curious img.pet-blink{opacity:0!important}
+#mascot.pose-curious img.pet-curious{opacity:1;animation:pet-curious-tilt 3.8s ease-in-out infinite}
+@keyframes pet-curious-tilt{0%,100%{rotate:0deg}38%{rotate:-2.4deg}72%{rotate:1.3deg}}
 #mascot.pose-hug-left img.hug-left{opacity:1;animation:pet-hug-l 3.9s ease-in-out infinite}
 #mascot.pose-hug-right img.hug-right{opacity:1;animation:pet-hug-r 3.9s ease-in-out infinite}
 @keyframes pet-hug-l{0%,100%{transform:rotate(.7deg) translateY(0)}50%{transform:rotate(-1.6deg) translateY(-3px)}}

@@ -18,6 +18,10 @@ let wa={x:0,y:0,width:0,height:0};
 let pos={x:0,y:0};
 let moveTimer=0,moveSeq=0,patrol={x:0,y:0,t:0};
 function apply(){root.style.setProperty("--pet-dx",dx.toFixed(1)+"px");root.style.setProperty("--pet-dy",dy.toFixed(1)+"px")}
+/* 朝向左/右：站姿和眨眼是两张整立绘叠在一起，必须同时镜像，
+   否则朝左时眨一下眼，眨眼帧会用未镜像的原图盖上几十毫秒——看起来就是原地「镜像抽搐」一下 */
+function setFlip(on){img.classList.toggle("flip",!!on);mascot.classList.toggle("flip",!!on)}
+function isFlip(){return img.classList.contains("flip")}
 function cancelGlide(){if(glideRaf){cancelAnimationFrame(glideRaf);glideRaf=0}}
 function invoke(a){try{return window.desktopMini.invoke(a)}catch(_){return Promise.reject(_)}}
 function readPos(){const r=mascot.getBoundingClientRect();
@@ -28,27 +32,55 @@ function playBounds(){const b=wa.width?{x:wa.x,y:wa.y,w:wa.width,h:wa.height}
  return{minX:b.x,maxX:b.x+b.w-size(),minY:b.y,maxY:b.y+b.h-size()}}
 function stopWalk(){clearTimeout(moveTimer);moveTimer=0;moveSeq++;walking=false;img.classList.remove("walking");
  try{invoke({type:"walk-stop"})}catch(_){}}
+let lastWalkAt=0,lastWalkDir=0,moveLog=[];
 function moveTo(tx,ty,ms,done){
  if(held||asleep)return;
  const cur=readPos(),lim=playBounds();
  tx=clamp(Math.round(tx),lim.minX,Math.max(lim.minX,lim.maxX));
  ty=clamp(Math.round(ty),lim.minY,Math.max(lim.minY,lim.maxY));
  const dist=Math.hypot(tx-cur.x,ty-cur.y);
- // 原地不用动：别打断正在进行的那一段行走，也别把 walking 状态卡住
- if(dist<14){if(!walking)done&&done();return}
+ // 太近就别开走：挪几像素却挂满「走路+摇摆」，看上去就是在原地抽
+ if(dist<26){if(!walking)done&&done();return}
  clearTimeout(moveTimer);
  ms=ms||Math.round(300+dist*2.15);
- // 朝向：横向位移太小就不转身，免得原地小幅挪动时整个人镜像翻来翻去
- if(Math.abs(tx-cur.x)>18)img.classList.toggle("flip",tx<cur.x);
- // 摇摆幅度跟着步幅走：小步轻晃，远行才明显摆起来
+ const ddx=tx-cur.x,sx0=window.screenX,sy0=window.screenY;
+ const wasFlip=isFlip();
+ // 只有真的横着走了才改朝向；竖直方向的小挪动不翻面
+ const wantFlip=Math.abs(ddx)>=26?ddx<0:null;
  const amp=dist>240?4.2:dist>120?3.2:2.2;
  img.style.setProperty("--waddle-amp",amp.toFixed(1)+"deg");
  img.style.setProperty("--waddle-ms",dist>200?".5s":".62s");
  walking=true;img.classList.add("walking");
  pos.x=tx;pos.y=ty;patrol={x:cur.x,y:cur.y,t:Date.now()};
+ if(Math.abs(ddx)>=26)lastWalkDir=Math.sign(ddx);
  const seq=++moveSeq;
  try{invoke({type:"walk-to",x:tx,y:ty,ms})}catch(_){}
- moveTimer=setTimeout(()=>{if(seq!==moveSeq)return;moveTimer=0;walking=false;img.classList.remove("walking");done&&done()},ms+60);
+ // 朝向等「真的开始挪动」那一帧再翻：否则会先原地镜像一下再起步
+ let raf=0,t0=performance.now();
+ if(null!==wantFlip&&wantFlip!==wasFlip){
+  const watch=()=>{
+   if(seq!==moveSeq||!walking)return;
+   if(Math.abs(window.screenX-sx0)>=1||Math.abs(window.screenY-sy0)>=1){setFlip(wantFlip);return}
+   if(performance.now()-t0<340)raf=requestAnimationFrame(watch);
+  };
+  raf=requestAnimationFrame(watch);
+ }
+ moveTimer=setTimeout(()=>{if(seq!==moveSeq)return;moveTimer=0;walking=false;img.classList.remove("walking");
+  lastWalkAt=Date.now();done&&done()},ms+60);
+ // 走了 300ms 一步没挪（贴边/被拦）：当没走，撤掉走路状态和刚才的翻面
+ setTimeout(()=>{
+  if(seq!==moveSeq||!walking)return;
+  if(Math.abs(window.screenX-sx0)+Math.abs(window.screenY-sy0)<3){
+   if(raf)cancelAnimationFrame(raf);
+   clearTimeout(moveTimer);moveTimer=0;moveSeq++;walking=false;img.classList.remove("walking");
+   if(null!==wantFlip)setFlip(wasFlip);
+   lastWalkAt=Date.now();
+   try{invoke({type:"walk-stop"})}catch(_){}
+   done&&done();
+  }
+ },300);
+ moveLog.push({t:Date.now(),dist:Math.round(dist),dx:Math.round(ddx),flip:wantFlip});
+ if(moveLog.length>30)moveLog.shift();
 }
 
 /* ---- 状态 ---- */
@@ -60,6 +92,7 @@ function setPose(name){
  mascot.classList.toggle("pose-sleep","sleep"===name);
  mascot.classList.toggle("pose-hug-left","hug-left"===name);
  mascot.classList.toggle("pose-hug-right","hug-right"===name);
+ mascot.classList.toggle("pose-curious","curious"===name);
 }
 function edgePose(){return"bottom"===pose?"loaf":"left"===pose?"hug-left":"right"===pose?"hug-right":""}
 function poseImg(){return"bottom"===pose?mascot.querySelector(".pet-pose-loaf"):"left"===pose?mascot.querySelector(".hug-left"):"right"===pose?mascot.querySelector(".hug-right"):null}
@@ -83,7 +116,7 @@ function fx(ch,n){for(let i=0;i<n;i++){const s=document.createElement("span");
 
 /* ---- 思考气泡台词（借用原有 #thought，按姿态选择锚定方向）---- */
 let lineTimer=0;
-function showThought(text,mode){
+function showThought(text,mode,holdMs){
  if(!thought)return;
  const t=thought.querySelector("#thought-text")||thought.firstElementChild;
  if(t)t.textContent=text;
@@ -94,7 +127,7 @@ function showThought(text,mode){
  thought.hidden=false;
  try{thought.animate([{opacity:0,transform:"translateY(8px) scale(.9)"},{opacity:1,transform:"translateY(0) scale(1)"}],{duration:210,easing:"ease-out"})}catch(_){}
  clearTimeout(lineTimer);
- lineTimer=setTimeout(()=>{thought.hidden=true;thought.classList.remove("thought-top","thought-left","thought-right","below")},3800);
+ lineTimer=setTimeout(()=>{thought.hidden=true;thought.classList.remove("thought-top","thought-left","thought-right","below")},holdMs||3800);
 }
 
 /* ---- 台词池（贴她的语气）---- */
@@ -211,6 +244,7 @@ mascot.addEventListener("pointerup",e=>{
  if(e.button!==0||mascot.classList.contains("dragging"))return;
  bump();
  const now=Date.now(),dbl=now-lastPoke<420;lastPoke=now;
+ if(mascot.classList.contains("pose-curious")){endCurious();fx("✦",2);return}
  if(asleep){wake(true);fx("✦",4);return}
  if(walking)stopWalk();
  let stage="";try{stage=thought&&thought.dataset&&thought.dataset.stage||""}catch(_){}
@@ -243,6 +277,7 @@ new MutationObserver(()=>{
  if(d&&!held){held=true;cancelGlide();walking=false;img.classList.remove("walking");
   stopWalk();
   const mb=mascotBox();drag0={mx:mb.l,my:mb.t,px:lastPtr?lastPtr.x:null,py:lastPtr?lastPtr.y:null};
+  if(mascot.classList.contains("pose-curious"))endCurious();
   clearPose();img.classList.add("held");if(asleep)wake(false);
   lookSeq++;mascot.classList.remove("pet-looking");root.style.setProperty("--pet-lean","0deg")}
  if(!d&&held){held=false;img.classList.remove("held");
@@ -270,6 +305,11 @@ function wander(depth){
   tx=clamp(Math.round(cur.x+(Math.random()<.5?-1:1)*(150+Math.random()*300)),lim.minX+14,lim.maxX-14);
   ty=clamp(Math.round(cur.y+(Math.random()*2-1)*110),lim.minY+14,lim.maxY-14);
   if(Math.hypot(tx-cur.x,ty-cur.y)<70)return;
+ }
+ // 刚走完就马上掉头，视觉上像在原地来回抽：这段短时间内压住反向，继续朝原方向走
+ if(Date.now()-lastWalkAt<2600&&lastWalkDir&&Math.sign(tx-cur.x)===-lastWalkDir){
+  tx=clamp(Math.round(cur.x+lastWalkDir*(160+Math.random()*260)),lim.minX+14,lim.maxX-14);
+  if(Math.abs(tx-cur.x)<80)return;
  }
  const step=Math.hypot(tx-cur.x,ty-cur.y);
  moveTo(tx,ty,Math.round(360+step*2.15),()=>{
@@ -300,6 +340,51 @@ function rest(){
   },42000+Math.random()*76000);
  },280);
 }
+
+/* ---- 好奇观察：看一眼屏幕上的某个窗口，跑过去问一句 ----
+   主进程负责枚举窗口 + 截取该窗口缩略图 + 让视觉模型生成问题；
+   这里只负责「走过去、摆疑问姿态、冒气泡」。频率靠 scheduleCuriosity 控制。 ---- */
+let curiousBusy=false,curiousHold=0;
+function endCurious(){
+ clearTimeout(curiousHold);curiousHold=0;
+ if(mascot.classList.contains("pose-curious")){setPose("");oneShot(img,"pet-land",520)}
+ curiousBusy=false;lastActive=Date.now();scheduleIdle();
+}
+function startCurious(question){
+ setPose("curious");
+ fx("?",2);
+ showThought(question,"",9000);
+ clearTimeout(curiousHold);
+ curiousHold=setTimeout(endCurious,8500+Math.random()*4500);
+}
+async function curiousAsk(){
+ if(curiousBusy||held||asleep||walking||pose||panelOpen())return false;
+ if(BUSY.test(img.className||"")||mascot.classList.contains("pet-looking"))return false;
+ curiousBusy=true;
+ // 等模型回话要几秒，先给个「嗯？」的反应，别像卡住一样干站着
+ fx("?",1);showThought("嗯……那边在干嘛？","",4200);
+ let r=null;
+ try{r=await invoke({type:"peek"})}catch(_){r=null}
+ if(!r||!r.ok){curiousBusy=false;return false}
+ if(held||asleep||pose||panelOpen()){curiousBusy=false;return false}
+ const w=r.window||{},lim=playBounds(),sz=size();
+ // 落点留出气泡宽度：气泡挂在窗口右上，太靠屏幕边会被裁掉
+ const tx=clamp(Math.round(w.x+Math.min(70,Math.max(24,(w.w||300)*.12))),lim.minX+150,lim.maxX);
+ const ty=clamp(Math.round(w.y+(w.h||400)-sz-4),lim.minY,lim.maxY);
+ const cur=readPos();
+ if(Math.hypot(tx-cur.x,ty-cur.y)<60)startCurious(r.question);
+ else moveTo(tx,ty,undefined,()=>{if(!held&&!asleep&&!pose&&!panelOpen())startCurious(r.question);else{curiousBusy=false;scheduleIdle()}});
+ return true;
+}
+function scheduleCuriosity(){
+ clearTimeout(curiosityTimer);
+ // 3.5~8 分钟一次机会；主进程还会按「用户是否真的在用电脑」二次过滤
+ curiosityTimer=setTimeout(()=>{
+  const go=Math.random()<.65?curiousAsk():Promise.resolve(false);
+  go.catch(()=>{}).then(()=>scheduleCuriosity());
+ },(5+Math.random()*6)*60000);
+}
+let curiosityTimer=0;
 
 /* ---- 小动作 ---- */
 let lookSeq=0;
@@ -352,7 +437,9 @@ setInterval(()=>{
 },500);
 
 /* ---- 面板打开 → 清姿态走回家 ---- */
-const panelObserver=new MutationObserver(()=>{if(panelOpen()&&!held){if(walking)stopWalk();clearPose();cancelGlide()}});
+const panelObserver=new MutationObserver(()=>{if(panelOpen()&&!held){
+ if(mascot.classList.contains("pose-curious"))endCurious();
+ if(walking)stopWalk();clearPose();cancelGlide()}});
 ["chat","call","options"].forEach(id=>{const el=$(id);el&&panelObserver.observe(el,{attributes:true,attributeFilter:["hidden"]})});
 
 /* ---- 眨眼：站姿上叠一层闭眼立绘，随机闪一下（偶尔连眨） ---- */
@@ -402,11 +489,12 @@ window.addEventListener("resize",()=>{if(pose){clearPose();cancelGlide()}});
 /* ---- 调试钩子（自动化验证用）---- */
 window.__petDebug={enterCling,clearPose,showThought,pose:()=>pose,off:()=>[dx,dy],edge:()=>edgeAtEnd(),box:()=>screenBox(),sim:(w,c)=>{drag0=w;lastPtr=c},
  moveTo,wander:(d)=>wander(d|0),wa:()=>wa,pos:()=>readPos(),reloadBounds:()=>loadBounds(9),act,look,stopWalk,
- flip:()=>img.classList.contains("flip"),walking:()=>walking,
+ flip:()=>isFlip(),setFlip:(v)=>setFlip(v),walking:()=>walking,moves:()=>moveLog.slice(),
  lie:n=>{setPose(n)},
  sleepNow:()=>{asleep=true;if(!pose)lieDown("sleep");placeZzz();zzz.classList.add("show")},
  wake:()=>wake(true),state:()=>({pose,asleep,held,cls:mascot.className}),
- blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on"))};
+ blink:()=>doBlink(1),blinking:()=>!!(blinkImg&&blinkImg.classList.contains("on")),
+ curious:()=>curiousAsk(),endCurious:()=>endCurious(),curiousNow:(q)=>{if(!q)return false;startCurious(q);return true},curiousBusy:()=>curiousBusy};
 
 apply();
 function loadBounds(tries){
@@ -422,4 +510,5 @@ function loadBounds(tries){
 }
 loadBounds(0);
 scheduleIdle();
+scheduleCuriosity();
 }();
